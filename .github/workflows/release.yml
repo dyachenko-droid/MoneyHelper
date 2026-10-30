@@ -17,6 +17,7 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           log-accepted-android-sdk-licenses: false
+          packages: platform-tools
 
       - name: Install SDK packages
         continue-on-error: true
