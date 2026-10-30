@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Денежный помощник — Политика конфиденциальности</title>
+<meta name="description" content="Privacy policy of the Денежный помощник app (ru.denpom.finance.app)">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F3F7FC;
+  --surface: #FFFFFF;
+  --surface-2: #EAF1FB;
+  --ink: #0E1B2E;
+  --ink-2: #4A5A72;
+  --line: #DCE5F1;
+  --pri: #1364CE;
+  --pri-ink: #FFFFFF;
+  --green: #32B364;
+  --green-soft: #DDF5E6;
+  --green-ink: #0F5A2E;
+  --hero-a: #0F3A90;
+  --hero-b: #1364CE;
+  --shadow: 0 1px 2px rgba(30,58,100,.06), 0 8px 24px rgba(30,58,100,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0A0F14;
+    --surface: #121A24;
+    --surface-2: #182434;
+    --ink: #E8EEF7;
+    --ink-2: #9AAAC0;
+    --line: #223247;
+    --pri: #80B3FD;
+    --pri-ink: #071A38;
+    --green: #65D68A;
+    --green-soft: #12301F;
+    --green-ink: #A6EDBE;
+    --hero-a: #0B2A66;
+    --hero-b: #144FA6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.6 "Onest", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Armenian", "Noto Sans", sans-serif;
+}
+a { color: var(--pri); }
+.hero {
+  background: radial-gradient(120% 140% at 85% 0%, var(--hero-b) 0%, var(--hero-a) 70%);
+  color: #fff;
+  padding: 20px 16px 72px;
+}
+.bar {
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand img { width: 44px; height: 44px; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+.brand b { font-weight: 600; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lang { position: relative; }
+.lang-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 14px;
+  border-radius: 20px; border: 1px solid rgba(255,255,255,.28);
+  background: rgba(255,255,255,.12); color: #fff;
+  font: 500 14px/1 inherit; font-family: inherit; cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.lang-btn:hover { background: rgba(255,255,255,.2); }
+.lang-btn svg { width: 18px; height: 18px; }
+.lang-menu {
+  position: absolute; right: 0; top: 48px; z-index: 10;
+  width: min(320px, calc(100vw - 32px));
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(10,20,40,.28);
+  padding: 6px; display: none;
+  max-height: 70vh; overflow-y: auto;
+}
+.lang-menu.open { display: block; }
+.lang-menu button {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 12px; border: 0; border-radius: 10px;
+  background: transparent; color: inherit; font: inherit; font-size: 15px; text-align: left; cursor: pointer;
+}
+.lang-menu button:hover, .lang-menu button:focus-visible { background: var(--surface-2); outline: none; }
+.lang-menu button[aria-selected="true"] { background: var(--surface-2); font-weight: 600; }
+.lang-menu .cur {
+  font-size: 12px; font-weight: 600; letter-spacing: .04em;
+  color: var(--green-ink); background: var(--green-soft);
+  padding: 3px 8px; border-radius: 8px;
+}
+.head { max-width: 820px; margin: 40px auto 0; }
+.head h1 { margin: 0 0 12px; font-size: clamp(28px, 6vw, 42px); line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
+.head p { margin: 0; max-width: 640px; color: rgba(255,255,255,.86); font-size: 17px; }
+.date {
+  display: inline-block; margin-top: 18px;
+  font-size: 13px; font-weight: 500;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(255,255,255,.14);
+}
+main { max-width: 820px; margin: -44px auto 0; padding: 0 16px 56px; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.fact {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+  padding: 18px; box-shadow: var(--shadow);
+}
+.fact .ic {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: var(--green-soft); color: var(--green-ink); margin-bottom: 12px;
+}
+.fact .ic svg { width: 22px; height: 22px; }
+.fact h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.fact p { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
+section {
+  margin-top: 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+  padding: 22px 22px 18px;
+}
+section h2 {
+  display: flex; align-items: center; gap: 12px;
+  margin: 0 0 10px; font-size: 19px; font-weight: 600; line-height: 1.3;
+}
+section h2 .n {
+  flex: none; width: 28px; height: 28px; border-radius: 9px;
+  display: grid; place-items: center;
+  background: var(--pri); color: var(--pri-ink); font-size: 14px; font-weight: 700;
+}
+section p { margin: 0 0 10px; color: var(--ink-2); }
+section ul { margin: 0 0 10px; padding: 0; list-style: none; }
+section li { position: relative; padding: 6px 0 6px 22px; color: var(--ink-2); }
+section li::before {
+  content: ""; position: absolute; left: 4px; top: 15px;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+}
+.perm { display: grid; gap: 10px; margin-bottom: 8px; }
+.perm div { background: var(--surface-2); border-radius: 14px; padding: 12px 14px; color: var(--ink-2); }
+.perm b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+footer { margin-top: 28px; text-align: center; color: var(--ink-2); font-size: 13px; }
+footer code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+@media (max-width: 560px) {
+  .facts { grid-template-columns: minmax(0,1fr); }
+  section { padding: 18px 16px 14px; }
+  .lang-btn .lbl { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="bar">
+    <div class="brand"><img src="icon.png" alt=""><b>Денежный помощник</b></div>
+    <div class="lang">
+      <button class="lang-btn" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>
+        <span class="lbl" id="langName"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="lang-menu" id="langMenu" role="listbox"></div>
+    </div>
+  </div>
+  <div class="head">
+    <h1 id="title"></h1>
+    <p id="lead"></p>
+    <span class="date" id="updated"></span>
+  </div>
+</header>
+<main>
+  <div class="facts" id="facts"></div>
+  <div id="sections"></div>
+  <footer>Денежный помощник · <code>ru.denpom.finance.app</code></footer>
+</main>
+<script>
+const ISSUES = "https://github.com/dyachenko-droid/MoneyHelper/issues";
+const ICONS = [
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.8a15 15 0 0 1 4.2-2.6M10.7 5.1A15 15 0 0 1 22 8.8M5 12.5a10 10 0 0 1 5.2-2.7M16.8 10.9a10 10 0 0 1 2.2 1.6M8.5 16a5 5 0 0 1 7 0M12 20h.01M3 3l18 18"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/><path d="M3 3l18 18"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/><path d="M3 3l18 18"/></svg>',
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/></svg>'
+];
+const L = {
+ru: { name: "Русский", cur: "RUB",
+  title: "Политика конфиденциальности",
+  lead: "«Денежный помощник» — приложение для учёта личных финансов, которое работает полностью на вашем устройстве. Здесь описано, что приложение хранит, зачем ему разрешения и чего оно никогда не делает.",
+  updated: "Действует с 31 октября 2026 г.",
+  facts: [["Без интернета","У приложения нет разрешения на доступ к сети — оно не может никуда отправить данные."],["Без аккаунта","Не нужны регистрация, почта или номер телефона."],["Без рекламы и аналитики","Никаких трекеров, рекламных идентификаторов и сборщиков ошибок."],["Данные остаются у вас","Всё хранится в закрытом хранилище приложения на телефоне."]],
+  s: [
+    ["Что хранит приложение", "Сохраняется только то, что вы вводите сами, — в закрытом хранилище приложения на вашем устройстве:",
+      ["счета и их остатки","доходы и расходы, категории и правила автокатегорий","бюджеты, цели-копилки, долги и кредиты","регулярные платежи и подписки","отсканированные чеки: позиции, суммы, дата и фото чека","настройки: валюта, тема, время напоминаний и PIN-код — только в виде хеша"],
+      "Облачное резервное копирование Android для приложения отключено, поэтому данные не копируются на серверы Google."],
+    ["Разрешения", null, null, null, [
+      ["Камера","чтобы считать QR-код с чека и сфотографировать чек. Изображения распознаются прямо на устройстве встроенными библиотеками (сканер штрихкодов ML Kit, Tesseract) и никуда не загружаются."],
+      ["Уведомления","для напоминаний, которые вы включили сами: о ежедневной записи и о предстоящих платежах."],
+      ["Биометрия","чтобы открывать приложение отпечатком или по лицу, если вы это включили. Приложение получает от Android только ответ «успешно / нет» и никогда — сами биометрические данные."],
+      ["Вибрация","для тактильного отклика."],
+      ["Планировщик задач","состояние сети, удержание устройства в активном режиме и запуск после перезагрузки нужны системному компоненту WorkManager, чтобы напоминания приходили вовремя. Без разрешения на интернет приложение не может пользоваться сетью."]]],
+    ["Передача третьим лицам", "Приложение не продаёт, не передаёт и не раскрывает ваши данные. В нём нет рекламы, аналитики и сторонних SDK, собирающих данные."],
+    ["Экспорт, резервная копия и импорт", "Файлы создаются только по вашей команде: экспорт в CSV или резервная копия сохраняются туда, куда вы укажете в системном окне выбора файла, а банковская выписка при импорте читается локально. Дальше файл находится в вашем распоряжении."],
+    ["Хранение и удаление", "Данные хранятся, пока вы сами не удалите их в приложении. При удалении приложения или очистке его данных всё стирается безвозвратно."],
+    ["Дети", "Приложение не предназначено для детей младше 13 лет и сознательно не собирает никаких персональных данных."],
+    ["Изменения политики", "Если политика изменится, новая версия будет опубликована на этой странице с новой датой."],
+    ["Связь", "Вопросы о конфиденциальности можно задать, создав обращение в репозитории проекта:"]
+  ]},
+en: { name: "English", cur: "USD · EUR",
+  title: "Privacy Policy",
+  lead: "Денежный помощник (Money Helper) is a personal finance app that works entirely on your device. This policy explains what the app stores, why it asks for permissions and what it never does.",
+  updated: "Effective date: October 31, 2026",
+  facts: [["No internet access","The app has no network permission and cannot send data anywhere."],["No account","No sign-up, no email, no phone number."],["No ads or analytics","No trackers, advertising IDs or crash reporters."],["Your data stays with you","Everything is kept in the app's private storage on your phone."]],
+  s: [
+    ["What the app stores", "Only the information you enter yourself is saved, in the app's private storage on your device:",
+      ["accounts and their balances","income and expense records, categories and auto-categorisation rules","budgets, savings goals, debts and loans","recurring payments and subscriptions","scanned receipts: items, amounts, date and the receipt photo","settings: currency, theme, reminder time and a PIN code stored only as a hash"],
+      "Android cloud backup is turned off for the app, so this data is not copied to Google servers."],
+    ["Permissions", null, null, null, [
+      ["Camera","to read the QR code on a receipt and to photograph receipts. Images are recognised on the device by built-in libraries (ML Kit barcode scanner, Tesseract) and are never uploaded."],
+      ["Notifications","for the reminders you turn on yourself: the daily entry reminder and upcoming payments."],
+      ["Biometrics","to unlock the app with your fingerprint or face if you enable it. The app only receives a success or failure answer from Android, never your biometric data."],
+      ["Vibration","for haptic feedback."],
+      ["Task scheduling","network state, wake lock and start after reboot are used by Android's WorkManager component to deliver reminders on time. Without the internet permission the app cannot use the network."]]],
+    ["Sharing with third parties", "The app does not sell, share or disclose your data. It contains no advertising, no analytics and no third-party SDKs that collect data."],
+    ["Export, backup and import", "Files are created only when you ask for them: a CSV export or a backup copy is saved where you choose in the system file picker, and a bank statement is read locally when you import it. After that the file is under your control."],
+    ["Storage and deletion", "Data is kept until you delete it in the app. Uninstalling the app or clearing its data erases everything permanently."],
+    ["Children", "The app is not directed at children under 13 and does not knowingly collect any personal information."],
+    ["Changes to this policy", "If the policy changes, the new version will be published on this page with an updated date."],
+    ["Contact", "Questions about privacy can be raised by opening an issue in the project repository:"]
+  ]},
+be: { name: "Беларуская", cur: "BYN",
+  title: "Палітыка прыватнасці",
+  lead: "«Денежный помощник» — праграма для ўліку асабістых фінансаў, якая цалкам працуе на вашай прыладзе. Тут апісана, што праграма захоўвае, навошта ёй дазволы і чаго яна ніколі не робіць.",
+  updated: "Дзейнічае з 31 кастрычніка 2026 г.",
+  facts: [["Без інтэрнэту","У праграмы няма дазволу на доступ да сеткі — яна не можа нікуды адправіць даныя."],["Без акаўнта","Не патрэбныя рэгістрацыя, пошта ці нумар тэлефона."],["Без рэкламы і аналітыкі","Ніякіх трэкераў, рэкламных ідэнтыфікатараў і зборшчыкаў памылак."],["Даныя застаюцца ў вас","Усё захоўваецца ў закрытым сховішчы праграмы на тэлефоне."]],
+  s: [
+    ["Што захоўвае праграма", "Захоўваецца толькі тое, што вы ўводзіце самі, — у закрытым сховішчы праграмы на вашай прыладзе:",
+      ["рахункі і іх рэшткі","даходы і выдаткі, катэгорыі і правілы аўтакатэгорый","бюджэты, мэты-скарбонкі, даўгі і крэдыты","рэгулярныя плацяжы і падпіскі","адсканаваныя чэкі: пазіцыі, сумы, дата і фота чэка","налады: валюта, тэма, час напамінаў і PIN-код — толькі ў выглядзе хэша"],
+      "Воблачнае рэзервовае капіраванне Android для праграмы адключана, таму даныя не капіруюцца на серверы Google."],
+    ["Дазволы", null, null, null, [
+      ["Камера","каб счытаць QR-код з чэка і сфатаграфаваць чэк. Выявы распазнаюцца проста на прыладзе ўбудаванымі бібліятэкамі (сканер штрыхкодаў ML Kit, Tesseract) і нікуды не загружаюцца."],
+      ["Апавяшчэнні","для напамінаў, якія вы ўключылі самі: пра штодзённы запіс і пра будучыя плацяжы."],
+      ["Біяметрыя","каб адкрываць праграму адбіткам пальца або тварам, калі вы гэта ўключылі. Праграма атрымлівае ад Android толькі адказ «паспяхова / не» і ніколі — самі біяметрычныя даныя."],
+      ["Вібрацыя","для тактыльнага водгуку."],
+      ["Планавальнік задач","стан сеткі, утрыманне прылады ў актыўным рэжыме і запуск пасля перазагрузкі патрэбныя сістэмнаму кампаненту WorkManager, каб напаміны прыходзілі своечасова. Без дазволу на інтэрнэт праграма не можа карыстацца сеткай."]]],
+    ["Перадача трэцім асобам", "Праграма не прадае, не перадае і не раскрывае вашы даныя. У ёй няма рэкламы, аналітыкі і іншых SDK, якія збіраюць даныя."],
+    ["Экспарт, рэзервовая копія і імпарт", "Файлы ствараюцца толькі па вашай камандзе: экспарт у CSV або рэзервовая копія захоўваюцца туды, куды вы пакажаце ў сістэмным акне выбару файла, а банкаўская выпіска пры імпарце чытаецца лакальна. Далей файл знаходзіцца ў вашым распараджэнні."],
+    ["Захоўванне і выдаленне", "Даныя захоўваюцца, пакуль вы самі не выдаліце іх у праграме. Пры выдаленні праграмы або ачыстцы яе даных усё сціраецца беззваротна."],
+    ["Дзеці", "Праграма не прызначана для дзяцей да 13 гадоў і свядома не збірае ніякіх персанальных даных."],
+    ["Змены палітыкі", "Калі палітыка зменіцца, новая версія будзе апублікавана на гэтай старонцы з новай датай."],
+    ["Сувязь", "Пытанні пра прыватнасць можна задаць, стварыўшы зварот у рэпазіторыі праекта:"]
+  ]},
+kk: { name: "Қазақша", cur: "KZT",
+  title: "Құпиялылық саясаты",
+  lead: "«Денежный помощник» — жеке қаржыны есепке алуға арналған, толығымен сіздің құрылғыңызда жұмыс істейтін қолданба. Бұл жерде қолданба нені сақтайтыны, рұқсаттар не үшін қажет екені және ол ешқашан не істемейтіні сипатталған.",
+  updated: "31 қазан 2026 ж. бастап күшінде",
+  facts: [["Интернетсіз","Қолданбада желіге кіру рұқсаты жоқ — ол деректерді ешқайда жібере алмайды."],["Аккаунтсыз","Тіркелу, пошта немесе телефон нөмірі қажет емес."],["Жарнамасыз және аналитикасыз","Ешқандай трекер, жарнама идентификаторы немесе қате жинағыш жоқ."],["Деректер сізде қалады","Барлығы телефондағы қолданбаның жабық жадында сақталады."]],
+  s: [
+    ["Қолданба нені сақтайды", "Тек өзіңіз енгізген ақпарат қана құрылғыңыздағы қолданбаның жабық жадында сақталады:",
+      ["шоттар және олардың қалдықтары","кірістер мен шығыстар, санаттар және автосанат ережелері","бюджеттер, жинақ мақсаттары, қарыздар мен несиелер","тұрақты төлемдер мен жазылымдар","сканерленген чектер: тауарлар, сомалар, күні және чек фотосы","баптаулар: валюта, тақырып, еске салу уақыты және PIN-код — тек хеш түрінде"],
+      "Қолданба үшін Android бұлттық сақтық көшірмесі өшірілген, сондықтан деректер Google серверлеріне көшірілмейді."],
+    ["Рұқсаттар", null, null, null, [
+      ["Камера","чектегі QR-кодты оқу және чекті суретке түсіру үшін. Суреттер құрылғының өзінде кіріктірілген кітапханалармен (ML Kit штрихкод сканері, Tesseract) танылады және ешқайда жүктелмейді."],
+      ["Хабарландырулар","өзіңіз қосқан еске салулар үшін: күнделікті жазба және алдағы төлемдер туралы."],
+      ["Биометрия","егер қоссаңыз, қолданбаны саусақ ізімен немесе бетпен ашу үшін. Қолданба Android-тан тек «сәтті / жоқ» деген жауапты алады, биометриялық деректердің өзін ешқашан алмайды."],
+      ["Діріл","тактильді кері байланыс үшін."],
+      ["Тапсырмаларды жоспарлау","желі күйі, құрылғыны белсенді күйде ұстау және қайта жүктелгеннен кейін іске қосу еске салулар уақытында келуі үшін жүйелік WorkManager құрамдасына қажет. Интернет рұқсатынсыз қолданба желіні пайдалана алмайды."]]],
+    ["Үшінші тұлғаларға беру", "Қолданба деректеріңізді сатпайды, бермейді және жарияламайды. Онда жарнама, аналитика және деректер жинайтын бөгде SDK жоқ."],
+    ["Экспорт, сақтық көшірме және импорт", "Файлдар тек сіздің пәрменіңіз бойынша жасалады: CSV экспорты немесе сақтық көшірме жүйелік файл таңдау терезесінде көрсеткен жерге сақталады, ал банк үзінді көшірмесі импорт кезінде жергілікті түрде оқылады. Одан кейін файл сіздің иелігіңізде болады."],
+    ["Сақтау және жою", "Деректер оларды қолданбада өзіңіз жойғанша сақталады. Қолданбаны жойғанда немесе оның деректерін тазартқанда бәрі біржола өшіріледі."],
+    ["Балалар", "Қолданба 13 жасқа толмаған балаларға арналмаған және ешқандай жеке деректерді әдейі жинамайды."],
+    ["Саясаттағы өзгерістер", "Саясат өзгерсе, жаңа нұсқасы осы бетте жаңа күнімен жарияланады."],
+    ["Байланыс", "Құпиялылық туралы сұрақтарды жоба репозиторийінде өтініш ашу арқылы қоюға болады:"]
+  ]},
+uz: { name: "Oʻzbekcha", cur: "UZS",
+  title: "Maxfiylik siyosati",
+  lead: "«Денежный помощник» — shaxsiy moliyani hisobga olish uchun to‘liq qurilmangizda ishlaydigan ilova. Bu yerda ilova nimalarni saqlashi, ruxsatlar nima uchun kerakligi va u hech qachon nima qilmasligi tushuntirilgan.",
+  updated: "2026-yil 31-oktabrdan amal qiladi",
+  facts: [["Internetsiz","Ilovada tarmoqqa kirish ruxsati yo‘q — u ma’lumotlarni hech qayerga yubora olmaydi."],["Akkauntsiz","Ro‘yxatdan o‘tish, pochta yoki telefon raqami kerak emas."],["Reklama va analitikasiz","Hech qanday treker, reklama identifikatori yoki xatolik yig‘uvchisi yo‘q."],["Ma’lumotlar sizda qoladi","Hammasi telefoningizdagi ilovaning yopiq xotirasida saqlanadi."]],
+  s: [
+    ["Ilova nimalarni saqlaydi", "Faqat o‘zingiz kiritgan ma’lumotlar qurilmangizdagi ilovaning yopiq xotirasida saqlanadi:",
+      ["hisoblar va ularning qoldiqlari","daromad va xarajatlar, toifalar va avtotoifa qoidalari","byudjetlar, jamg‘arma maqsadlari, qarzlar va kreditlar","muntazam to‘lovlar va obunalar","skanerlangan cheklar: mahsulotlar, summalar, sana va chek surati","sozlamalar: valyuta, mavzu, eslatma vaqti va PIN-kod — faqat xesh ko‘rinishida"],
+      "Ilova uchun Android bulutli zaxira nusxasi o‘chirilgan, shuning uchun ma’lumotlar Google serverlariga ko‘chirilmaydi."],
+    ["Ruxsatlar", null, null, null, [
+      ["Kamera","chekdagi QR-kodni o‘qish va chekni suratga olish uchun. Tasvirlar qurilmaning o‘zida o‘rnatilgan kutubxonalar (ML Kit shtrix-kod skaneri, Tesseract) yordamida aniqlanadi va hech qayerga yuklanmaydi."],
+      ["Bildirishnomalar","o‘zingiz yoqqan eslatmalar uchun: kundalik yozuv va yaqinlashayotgan to‘lovlar haqida."],
+      ["Biometriya","agar yoqsangiz, ilovani barmoq izi yoki yuz orqali ochish uchun. Ilova Android’dan faqat «muvaffaqiyatli / yo‘q» javobini oladi, biometrik ma’lumotlarning o‘zini hech qachon olmaydi."],
+      ["Tebranish","taktil javob uchun."],
+      ["Vazifalarni rejalashtirish","tarmoq holati, qurilmani faol holatda ushlab turish va qayta yuklangandan keyin ishga tushish eslatmalar o‘z vaqtida kelishi uchun tizimning WorkManager komponentiga kerak. Internet ruxsatisiz ilova tarmoqdan foydalana olmaydi."]]],
+    ["Uchinchi shaxslarga berish", "Ilova ma’lumotlaringizni sotmaydi, bermaydi va oshkor qilmaydi. Unda reklama, analitika va ma’lumot yig‘uvchi begona SDK’lar yo‘q."],
+    ["Eksport, zaxira nusxa va import", "Fayllar faqat sizning buyrug‘ingiz bilan yaratiladi: CSV eksporti yoki zaxira nusxa tizimning fayl tanlash oynasida ko‘rsatgan joyingizga saqlanadi, bank ko‘chirmasi esa import paytida mahalliy tarzda o‘qiladi. Shundan so‘ng fayl sizning ixtiyoringizda bo‘ladi."],
+    ["Saqlash va o‘chirish", "Ma’lumotlar ularni ilovada o‘zingiz o‘chirmaguningizcha saqlanadi. Ilova o‘chirilganda yoki uning ma’lumotlari tozalanganda hammasi butunlay o‘chib ketadi."],
+    ["Bolalar", "Ilova 13 yoshgacha bo‘lgan bolalar uchun mo‘ljallanmagan va hech qanday shaxsiy ma’lumotlarni ataylab yig‘maydi."],
+    ["Siyosatdagi o‘zgarishlar", "Siyosat o‘zgarsa, yangi versiyasi yangi sana bilan shu sahifada e’lon qilinadi."],
+    ["Aloqa", "Maxfiylik bo‘yicha savollarni loyiha repozitoriysida murojaat ochib berishingiz mumkin:"]
+  ]},
+ky: { name: "Кыргызча", cur: "KGS",
+  title: "Купуялык саясаты",
+  lead: "«Денежный помощник» — жеке финансыны эсепке алуу үчүн толугу менен сиздин түзмөгүңүздө иштеген тиркеме. Бул жерде тиркеме эмнелерди сактаары, уруксаттар эмне үчүн керек экени жана ал эч качан эмне кылбай турганы баяндалат.",
+  updated: "2026-жылдын 31-октябрынан тартып күчүндө",
+  facts: [["Интернетсиз","Тиркемеде тармакка кирүү уруксаты жок — ал маалыматтарды эч жакка жөнөтө албайт."],["Аккаунтсуз","Катталуу, почта же телефон номери талап кылынбайт."],["Жарнамасыз жана аналитикасыз","Эч кандай трекер, жарнамалык идентификатор же ката чогултуучу жок."],["Маалыматтар сизде калат","Баары телефондогу тиркеменин жабык сактагычында сакталат."]],
+  s: [
+    ["Тиркеме эмнелерди сактайт", "Өзүңүз киргизген маалымат гана түзмөгүңүздөгү тиркеменин жабык сактагычында сакталат:",
+      ["эсептер жана алардын калдыктары","кирешелер жана чыгашалар, категориялар жана автокатегория эрежелери","бюджеттер, топтоо максаттары, карыздар жана кредиттер","үзгүлтүксүз төлөмдөр жана жазылуулар","сканерленген чектер: товарлар, суммалар, күнү жана чектин сүрөтү","жөндөөлөр: валюта, тема, эскертүү убактысы жана PIN-код — хеш түрүндө гана"],
+      "Тиркеме үчүн Android булуттагы камдык көчүрмөсү өчүрүлгөн, ошондуктан маалыматтар Google серверлерине көчүрүлбөйт."],
+    ["Уруксаттар", null, null, null, [
+      ["Камера","чектеги QR-кодду окуу жана чекти сүрөткө тартуу үчүн. Сүрөттөр түзмөктүн өзүндө орнотулган китепканалар (ML Kit штрихкод сканери, Tesseract) аркылуу таанылат жана эч жакка жүктөлбөйт."],
+      ["Билдирмелер","өзүңүз күйгүзгөн эскертүүлөр үчүн: күнүмдүк жазуу жана жакындап келе жаткан төлөмдөр жөнүндө."],
+      ["Биометрия","эгер күйгүзсөңүз, тиркемени манжа изи же жүз аркылуу ачуу үчүн. Тиркеме Android'ден «ийгиликтүү / жок» деген жоопту гана алат, биометриялык маалыматтардын өзүн эч качан албайт."],
+      ["Дирилдөө","тактилдик жооп үчүн."],
+      ["Тапшырмаларды пландоо","тармактын абалы, түзмөктү активдүү абалда кармоо жана өчүп-күйгөндөн кийин иштетүү эскертүүлөр өз убагында келиши үчүн системалык WorkManager компонентине керек. Интернет уруксатысыз тиркеме тармакты колдоно албайт."]]],
+    ["Үчүнчү жактарга берүү", "Тиркеме маалыматтарыңызды сатпайт, бербейт жана ачыкка чыгарбайт. Анда жарнама, аналитика жана маалымат чогулткан бөтөн SDK жок."],
+    ["Экспорт, камдык көчүрмө жана импорт", "Файлдар сиздин буйругуңуз менен гана түзүлөт: CSV экспорту же камдык көчүрмө системалык файл тандоо терезесинде көрсөткөн жериңизге сакталат, ал эми банк көчүрмөсү импорттоодо жергиликтүү окулат. Андан кийин файл сиздин карамагыңызда болот."],
+    ["Сактоо жана өчүрүү", "Маалыматтар аларды тиркемеде өзүңүз өчүрмөйүнчө сакталат. Тиркемени өчүргөндө же анын маалыматтарын тазалаганда баары биротоло өчүрүлөт."],
+    ["Балдар", "Тиркеме 13 жашка чейинки балдарга арналган эмес жана эч кандай жеке маалыматтарды атайылап чогултпайт."],
+    ["Саясаттагы өзгөрүүлөр", "Саясат өзгөрсө, жаңы версиясы ушул бетте жаңы күнү менен жарыяланат."],
+    ["Байланыш", "Купуялык боюнча суроолорду долбоордун репозиторийинде кайрылуу ачып берсеңиз болот:"]
+  ]},
+tg: { name: "Тоҷикӣ", cur: "TJS",
+  title: "Сиёсати махфият",
+  lead: "«Денежный помощник» — барномаи баҳисобгирии молияи шахсӣ, ки пурра дар дастгоҳи шумо кор мекунад. Дар ин ҷо гуфта мешавад, ки барнома чиро нигоҳ медорад, иҷозатҳо барои чӣ лозиманд ва он ҳеҷ гоҳ чӣ кор намекунад.",
+  updated: "Аз 31 октябри соли 2026 эътибор дорад",
+  facts: [["Бе интернет","Барнома иҷозати дастрасӣ ба шабакаро надорад — он маълумотро ба ҳеҷ ҷо фиристода наметавонад."],["Бе аккаунт","Бақайдгирӣ, почта ё рақами телефон лозим нест."],["Бе реклама ва таҳлил","Ягон трекер, идентификатори рекламавӣ ё ҷамъкунандаи хатоҳо нест."],["Маълумот дар назди шумо мемонад","Ҳама чиз дар хотираи пӯшидаи барнома дар телефон нигоҳ дошта мешавад."]],
+  s: [
+    ["Барнома чиро нигоҳ медорад", "Танҳо маълумоте, ки худатон ворид мекунед, дар хотираи пӯшидаи барнома дар дастгоҳатон нигоҳ дошта мешавад:",
+      ["ҳисобҳо ва бақияи онҳо","даромад ва хароҷот, категорияҳо ва қоидаҳои автокатегория","буҷетҳо, ҳадафҳои пасандоз, қарзҳо ва кредитҳо","пардохтҳои мунтазам ва обунаҳо","чекҳои сканшуда: молҳо, маблағҳо, сана ва акси чек","танзимот: асъор, мавзӯъ, вақти ёдраскунӣ ва PIN-код — танҳо дар шакли хеш"],
+      "Нусхабардории абрии Android барои барнома хомӯш аст, бинобар ин маълумот ба серверҳои Google нусхабардорӣ намешавад."],
+    ["Иҷозатҳо", null, null, null, [
+      ["Камера","барои хондани QR-коди чек ва аксбардории чек. Тасвирҳо бевосита дар дастгоҳ бо китобхонаҳои дарунсохт (сканери штрихкоди ML Kit, Tesseract) шинохта мешаванд ва ба ҳеҷ ҷо бор карда намешаванд."],
+      ["Огоҳиномаҳо","барои ёдраскуниҳое, ки худатон фаъол кардаед: дар бораи сабти ҳаррӯза ва пардохтҳои наздик."],
+      ["Биометрия","барои кушодани барнома бо изи ангушт ё чеҳра, агар шумо инро фаъол карда бошед. Барнома аз Android танҳо ҷавоби «бомуваффақият / не»-ро мегирад ва ҳеҷ гоҳ худи маълумоти биометриро намегирад."],
+      ["Ларзиш","барои посухи ламсӣ."],
+      ["Банақшагирии вазифаҳо","ҳолати шабака, дар ҳолати фаъол нигоҳ доштани дастгоҳ ва оғоз пас аз бозоғозӣ ба ҷузъи системавии WorkManager лозиманд, то ёдраскуниҳо сари вақт расанд. Бе иҷозати интернет барнома аз шабака истифода бурда наметавонад."]]],
+    ["Ба шахсони сеюм додан", "Барнома маълумоти шуморо намефурӯшад, намедиҳад ва ошкор намекунад. Дар он реклама, таҳлил ва SDK-ҳои бегонае, ки маълумот ҷамъ мекунанд, нест."],
+    ["Содирот, нусхаи эҳтиётӣ ва воридот", "Файлҳо танҳо бо фармони шумо сохта мешаванд: содирот ба CSV ё нусхаи эҳтиётӣ дар ҷое нигоҳ дошта мешаванд, ки шумо дар равзанаи системавии интихоби файл нишон медиҳед, ва ҳисоботи бонкӣ ҳангоми воридот маҳаллӣ хонда мешавад. Пас аз он файл дар ихтиёри шумост."],
+    ["Нигоҳдорӣ ва нест кардан", "Маълумот то он даме нигоҳ дошта мешавад, ки худатон онро дар барнома нест накунед. Ҳангоми нест кардани барнома ё тоза кардани маълумоти он ҳама чиз комилан нест мешавад."],
+    ["Кӯдакон", "Барнома барои кӯдакони то 13-сола пешбинӣ нашудааст ва дидаю дониста ягон маълумоти шахсиро ҷамъ намекунад."],
+    ["Тағйирот дар сиёсат", "Агар сиёсат тағйир ёбад, версияи нав дар ҳамин саҳифа бо санаи нав нашр мешавад."],
+    ["Тамос", "Саволҳо дар бораи махфиятро метавонед бо кушодани муроҷиат дар анбори лоиҳа диҳед:"]
+  ]},
+hy: { name: "Հայերեն", cur: "AMD",
+  title: "Գաղտնիության քաղաքականություն",
+  lead: "«Денежный помощник»-ը անձնական ֆինանսների հաշվառման հավելված է, որն ամբողջությամբ աշխատում է ձեր սարքում։ Այստեղ նկարագրված է, թե ինչ է պահում հավելվածը, ինչու են անհրաժեշտ թույլտվությունները և ինչ այն երբեք չի անում։",
+  updated: "Գործում է 2026 թ. հոկտեմբերի 31-ից",
+  facts: [["Առանց ինտերնետի","Հավելվածը ցանցից օգտվելու թույլտվություն չունի և չի կարող տվյալներ ուղարկել որևէ տեղ։"],["Առանց հաշվի","Գրանցում, էլ. փոստ կամ հեռախոսահամար պետք չէ։"],["Առանց գովազդի և վերլուծության","Ոչ մի հետագծիչ, գովազդային նույնացուցիչ կամ սխալների հավաքիչ։"],["Տվյալները մնում են ձեզ մոտ","Ամեն ինչ պահվում է հեռախոսում՝ հավելվածի փակ պահոցում։"]],
+  s: [
+    ["Ինչ է պահում հավելվածը", "Պահվում է միայն այն, ինչ դուք ինքներդ եք մուտքագրում, ձեր սարքում՝ հավելվածի փակ պահոցում․",
+      ["հաշիվներ և դրանց մնացորդները","եկամուտներ և ծախսեր, կատեգորիաներ և ավտոկատեգորիայի կանոններ","բյուջեներ, խնայողական նպատակներ, պարտքեր և վարկեր","պարբերական վճարումներ և բաժանորդագրություններ","սկանավորված կտրոններ՝ ապրանքներ, գումարներ, ամսաթիվ և կտրոնի լուսանկար","կարգավորումներ՝ արժույթ, թեմա, հիշեցման ժամ և PIN-կոդ՝ միայն հեշի տեսքով"],
+      "Android-ի ամպային պահուստավորումը հավելվածի համար անջատված է, ուստի տվյալները չեն պատճենվում Google-ի սերվերներ։"],
+    ["Թույլտվություններ", null, null, null, [
+      ["Տեսախցիկ","կտրոնի QR-կոդը կարդալու և կտրոնը լուսանկարելու համար։ Պատկերները ճանաչվում են անմիջապես սարքում՝ ներկառուցված գրադարաններով (ML Kit շտրիխ-կոդի սկաներ, Tesseract), և ոչ մի տեղ չեն վերբեռնվում։"],
+      ["Ծանուցումներ","ձեր իսկ միացրած հիշեցումների համար՝ ամենօրյա գրառման և առաջիկա վճարումների մասին։"],
+      ["Կենսաչափություն","հավելվածը մատնահետքով կամ դեմքով բացելու համար, եթե դա միացրել եք։ Հավելվածը Android-ից ստանում է միայն «հաջող է / ոչ» պատասխանը և երբեք՝ կենսաչափական տվյալները։"],
+      ["Թրթռոց","շոշափելի արձագանքի համար։"],
+      ["Առաջադրանքների պլանավորում","ցանցի վիճակը, սարքն ակտիվ պահելը և վերագործարկումից հետո մեկնարկը անհրաժեշտ են WorkManager համակարգային բաղադրիչին, որպեսզի հիշեցումները ժամանակին գան։ Առանց ինտերնետի թույլտվության հավելվածը չի կարող օգտվել ցանցից։"]]],
+    ["Փոխանցում երրորդ անձանց", "Հավելվածը չի վաճառում, չի փոխանցում և չի բացահայտում ձեր տվյալները։ Այն չունի գովազդ, վերլուծություն կամ տվյալներ հավաքող կողմնակի SDK-ներ։"],
+    ["Արտահանում, պահուստային պատճեն և ներմուծում", "Ֆայլերը ստեղծվում են միայն ձեր հրամանով՝ CSV արտահանումը կամ պահուստային պատճենը պահվում են այնտեղ, որտեղ նշում եք ֆայլի ընտրության համակարգային պատուհանում, իսկ բանկային քաղվածքը ներմուծելիս կարդացվում է տեղում։ Դրանից հետո ֆայլը ձեր տնօրինության տակ է։"],
+    ["Պահպանում և ջնջում", "Տվյալները պահվում են այնքան ժամանակ, մինչև դուք ինքներդ դրանք չջնջեք հավելվածում։ Հավելվածը հեռացնելիս կամ դրա տվյալները մաքրելիս ամեն ինչ անդառնալիորեն ջնջվում է։"],
+    ["Երեխաներ", "Հավելվածը նախատեսված չէ 13 տարեկանից փոքր երեխաների համար և գիտակցաբար որևէ անձնական տվյալ չի հավաքում։"],
+    ["Քաղաքականության փոփոխություններ", "Եթե քաղաքականությունը փոխվի, նոր տարբերակը կհրապարակվի այս էջում՝ նոր ամսաթվով։"],
+    ["Կապ", "Գաղտնիության վերաբերյալ հարցերը կարող եք տալ՝ նախագծի պահոցում դիմում բացելով․"]
+  ]},
+az: { name: "Azərbaycanca", cur: "AZN",
+  title: "Məxfilik siyasəti",
+  lead: "«Денежный помощник» şəxsi maliyyənin uçotu üçün tamamilə sizin cihazınızda işləyən tətbiqdir. Burada tətbiqin nəyi saxladığı, icazələrin nə üçün lazım olduğu və onun heç vaxt nə etmədiyi izah olunur.",
+  updated: "31 oktyabr 2026-cı il tarixindən qüvvədədir",
+  facts: [["İnternetsiz","Tətbiqin şəbəkəyə giriş icazəsi yoxdur — o, məlumatları heç yerə göndərə bilməz."],["Hesabsız","Qeydiyyat, e-poçt və ya telefon nömrəsi tələb olunmur."],["Reklamsız və analitikasız","Heç bir izləyici, reklam identifikatoru və ya xəta toplayıcısı yoxdur."],["Məlumatlar sizdə qalır","Hər şey telefonda tətbiqin qapalı yaddaşında saxlanılır."]],
+  s: [
+    ["Tətbiq nəyi saxlayır", "Yalnız özünüzün daxil etdiyiniz məlumatlar cihazınızda, tətbiqin qapalı yaddaşında saxlanılır:",
+      ["hesablar və onların qalıqları","gəlir və xərclər, kateqoriyalar və avtokateqoriya qaydaları","büdcələr, yığım hədəfləri, borclar və kreditlər","müntəzəm ödənişlər və abunələr","skan edilmiş çeklər: mallar, məbləğlər, tarix və çekin şəkli","ayarlar: valyuta, mövzu, xatırlatma vaxtı və PIN-kod — yalnız heş şəklində"],
+      "Tətbiq üçün Android bulud ehtiyat nüsxəsi söndürülüb, buna görə məlumatlar Google serverlərinə köçürülmür."],
+    ["İcazələr", null, null, null, [
+      ["Kamera","çekdəki QR-kodu oxumaq və çeki şəkilə çəkmək üçün. Təsvirlər birbaşa cihazda daxili kitabxanalar (ML Kit ştrix-kod skaneri, Tesseract) ilə tanınır və heç yerə yüklənmir."],
+      ["Bildirişlər","özünüzün aktivləşdirdiyiniz xatırlatmalar üçün: gündəlik qeyd və yaxınlaşan ödənişlər haqqında."],
+      ["Biometrika","aktivləşdirmisinizsə, tətbiqi barmaq izi və ya üzlə açmaq üçün. Tətbiq Android-dən yalnız «uğurlu / yox» cavabını alır, biometrik məlumatların özünü heç vaxt almır."],
+      ["Vibrasiya","toxunma əks-əlaqəsi üçün."],
+      ["Tapşırıqların planlaşdırılması","şəbəkə vəziyyəti, cihazı aktiv saxlamaq və yenidən başladıqdan sonra işə düşmək xatırlatmaların vaxtında gəlməsi üçün sistemin WorkManager komponentinə lazımdır. İnternet icazəsi olmadan tətbiq şəbəkədən istifadə edə bilməz."]]],
+    ["Üçüncü şəxslərə ötürmə", "Tətbiq məlumatlarınızı satmır, ötürmür və açıqlamır. Onda reklam, analitika və məlumat toplayan kənar SDK-lar yoxdur."],
+    ["İxrac, ehtiyat nüsxə və idxal", "Fayllar yalnız sizin əmrinizlə yaradılır: CSV ixracı və ya ehtiyat nüsxə sistemin fayl seçmə pəncərəsində göstərdiyiniz yerə saxlanılır, bank çıxarışı isə idxal zamanı yerli olaraq oxunur. Bundan sonra fayl sizin sərəncamınızdadır."],
+    ["Saxlama və silmə", "Məlumatlar siz onları tətbiqdə silənə qədər saxlanılır. Tətbiqi sildikdə və ya onun məlumatlarını təmizlədikdə hər şey birdəfəlik silinir."],
+    ["Uşaqlar", "Tətbiq 13 yaşından kiçik uşaqlar üçün nəzərdə tutulmayıb və heç bir şəxsi məlumatı qəsdən toplamır."],
+    ["Siyasətdə dəyişikliklər", "Siyasət dəyişərsə, yeni versiya bu səhifədə yeni tarixlə dərc olunacaq."],
+    ["Əlaqə", "Məxfiliklə bağlı suallarınızı layihənin repozitoriyasında müraciət açaraq verə bilərsiniz:"]
+  ]},
+ro: { name: "Română", cur: "MDL",
+  title: "Politica de confidențialitate",
+  lead: "«Денежный помощник» este o aplicație pentru evidența finanțelor personale care funcționează integral pe dispozitivul dumneavoastră. Aici aflați ce stochează aplicația, de ce are nevoie de permisiuni și ce nu face niciodată.",
+  updated: "În vigoare din 31 octombrie 2026",
+  facts: [["Fără internet","Aplicația nu are permisiunea de acces la rețea și nu poate trimite date nicăieri."],["Fără cont","Nu sunt necesare înregistrare, e-mail sau număr de telefon."],["Fără reclame și analiză","Niciun tracker, identificator publicitar sau colector de erori."],["Datele rămân la dumneavoastră","Totul este păstrat în spațiul privat al aplicației pe telefon."]],
+  s: [
+    ["Ce stochează aplicația", "Se salvează doar ceea ce introduceți dumneavoastră, în spațiul privat al aplicației de pe dispozitiv:",
+      ["conturile și soldurile lor","veniturile și cheltuielile, categoriile și regulile de categorisire automată","bugetele, obiectivele de economisire, datoriile și creditele","plățile recurente și abonamentele","bonurile scanate: produse, sume, data și fotografia bonului","setările: moneda, tema, ora mementourilor și codul PIN — doar sub formă de hash"],
+      "Copierea de rezervă în cloud a Android este dezactivată pentru aplicație, astfel încât datele nu sunt copiate pe serverele Google."],
+    ["Permisiuni", null, null, null, [
+      ["Cameră","pentru a citi codul QR de pe bon și a fotografia bonul. Imaginile sunt recunoscute direct pe dispozitiv de biblioteci integrate (scanerul de coduri ML Kit, Tesseract) și nu sunt încărcate nicăieri."],
+      ["Notificări","pentru mementourile pe care le activați: despre înregistrarea zilnică și plățile apropiate."],
+      ["Biometrie","pentru a deschide aplicația cu amprenta sau fața, dacă ați activat această opțiune. Aplicația primește de la Android doar răspunsul «reușit / nu», niciodată datele biometrice."],
+      ["Vibrații","pentru răspuns tactil."],
+      ["Planificarea sarcinilor","starea rețelei, menținerea dispozitivului activ și pornirea după repornire sunt necesare componentei de sistem WorkManager, pentru ca mementourile să sosească la timp. Fără permisiunea de internet, aplicația nu poate folosi rețeaua."]]],
+    ["Transmiterea către terți", "Aplicația nu vinde, nu transmite și nu dezvăluie datele dumneavoastră. Nu conține reclame, analiză sau SDK-uri terțe care colectează date."],
+    ["Export, copie de rezervă și import", "Fișierele sunt create doar la comanda dumneavoastră: exportul CSV sau copia de rezervă se salvează unde indicați în fereastra de sistem de alegere a fișierului, iar extrasul bancar este citit local la import. Ulterior, fișierul se află la dispoziția dumneavoastră."],
+    ["Păstrare și ștergere", "Datele se păstrează până când le ștergeți în aplicație. La dezinstalarea aplicației sau ștergerea datelor ei, totul se șterge definitiv."],
+    ["Copii", "Aplicația nu este destinată copiilor sub 13 ani și nu colectează în mod intenționat date personale."],
+    ["Modificări ale politicii", "Dacă politica se modifică, noua versiune va fi publicată pe această pagină cu o dată nouă."],
+    ["Contact", "Întrebările despre confidențialitate le puteți adresa deschizând o solicitare în depozitul proiectului:"]
+  ]},
+tk: { name: "Türkmençe", cur: "TMT",
+  title: "Gizlinlik syýasaty",
+  lead: "«Денежный помощник» — şahsy maliýäni hasaba almak üçin doly siziň enjamyňyzda işleýän programma. Bu ýerde programmanyň näme saklaýandygy, rugsatlaryň näme üçin gerekdigi we onuň hiç haçan näme etmeýändigi beýan edilýär.",
+  updated: "2026-njy ýylyň 31-nji oktýabryndan güýje girýär",
+  facts: [["Internetsiz","Programmanyň tora girmäge rugsady ýok — ol maglumatlary hiç ýere iberip bilmeýär."],["Hasapsyz","Hasaba durmak, poçta ýa-da telefon belgisi gerek däl."],["Mahabatsyz we analitikasyz","Hiç hili yzarlaýjy, mahabat identifikatory ýa-da ýalňyş ýygnaýjy ýok."],["Maglumatlar sizde galýar","Hemme zat telefonda programmanyň ýapyk ammarynda saklanýar."]],
+  s: [
+    ["Programma näme saklaýar", "Diňe özüňiziň girizen maglumatlaryňyz enjamyňyzda, programmanyň ýapyk ammarynda saklanýar:",
+      ["hasaplar we olaryň galyndylary","girdejiler we çykdajylar, kategoriýalar we awtokategoriýa düzgünleri","býujetler, ýygnamak maksatlary, bergiler we karzlar","yzygiderli tölegler we abunalar","skanirlenen çekler: harytlar, möçberler, sene we çekiň suraty","sazlamalar: walýuta, tema, ýatlatma wagty we PIN-kod — diňe heş görnüşinde"],
+      "Programma üçin Android bulut ätiýaçlyk nusgasy öçürilen, şonuň üçin maglumatlar Google serwerlerine göçürilmeýär."],
+    ["Rugsatlar", null, null, null, [
+      ["Kamera","çekdäki QR-kody okamak we çekiň suratyny almak üçin. Şekiller enjamyň özünde gurlan kitaphanalar (ML Kit ştrih-kod skaneri, Tesseract) arkaly tanalýar we hiç ýere ýüklenmeýär."],
+      ["Bildirişler","özüňiziň açan ýatlatmalaryňyz üçin: gündelik ýazgy we golaýlaşýan tölegler barada."],
+      ["Biometrika","eger açan bolsaňyz, programmany barmak yzy ýa-da ýüz arkaly açmak üçin. Programma Android-den diňe «üstünlikli / ýok» jogabyny alýar, biometrik maglumatlaryň özüni hiç haçan almaýar."],
+      ["Yrgyldy","duýgur jogap üçin."],
+      ["Meseleleri meýilleşdirmek","toruň ýagdaýy, enjamy işjeň ýagdaýda saklamak we täzeden ýüklenenden soň işe başlamak ýatlatmalaryň wagtynda gelmegi üçin ulgamyň WorkManager bölegine gerek. Internet rugsady bolmasa, programma tordan peýdalanyp bilmeýär."]]],
+    ["Üçünji taraplara bermek", "Programma maglumatlaryňyzy satmaýar, bermeýär we aýan etmeýär. Onda mahabat, analitika we maglumat ýygnaýan daşary SDK ýok."],
+    ["Eksport, ätiýaçlyk nusga we import", "Faýllar diňe siziň buýrugyňyz bilen döredilýär: CSV eksporty ýa-da ätiýaçlyk nusga ulgamyň faýl saýlamak penjiresinde görkezen ýeriňize saklanýar, bank göçürmesi bolsa import wagtynda ýerli okalýar. Şondan soň faýl siziň ygtyýaryňyzda bolýar."],
+    ["Saklamak we pozmak", "Maglumatlar olary programmada özüňiz pozýançaňyz saklanýar. Programma aýrylanda ýa-da onuň maglumatlary arassalananda hemme zat düýbünden pozulýar."],
+    ["Çagalar", "Programma 13 ýaşdan kiçi çagalar üçin niýetlenmedik we hiç hili şahsy maglumatlary bilkastlaýyn ýygnamaýar."],
+    ["Syýasatdaky üýtgeşmeler", "Syýasat üýtgese, täze görnüşi täze sene bilen şu sahypada çap ediler."],
+    ["Habarlaşmak", "Gizlinlik barada soraglary taslamanyň repozitoriýasynda ýüztutma açyp berip bilersiňiz:"]
+  ]}
+};
+const ORDER = ["ru","en","be","kk","uz","ky","tg","hy","az","ro","tk"];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function pick() {
+  const q = new URLSearchParams(location.search).get("lang");
+  if (q && L[q]) return q;
+  try { const s = localStorage.getItem("privacy-lang"); if (s && L[s]) return s; } catch (e) {}
+  for (const l of navigator.languages || [navigator.language || ""]) {
+    const base = l.toLowerCase().split("-")[0];
+    if (base === "mo") return "ro";
+    if (L[base]) return base;
+  }
+  return "ru";
+}
+
+function render(code) {
+  const t = L[code];
+  document.documentElement.lang = code;
+  document.title = "Денежный помощник — " + t.title;
+  $("langName").textContent = t.name;
+  $("title").textContent = t.title;
+  $("lead").textContent = t.lead;
+  $("updated").textContent = t.updated;
+  $("facts").innerHTML = t.facts.map((f, i) =>
+    '<div class="fact"><div class="ic">' + ICONS[i] + '</div><h3>' + esc(f[0]) + '</h3><p>' + esc(f[1]) + '</p></div>').join("");
+  $("sections").innerHTML = t.s.map((s, i) => {
+    let body = "";
+    if (s[1]) body += "<p>" + esc(s[1]) + "</p>";
+    if (s[2]) body += "<ul>" + s[2].map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>";
+    if (s[3]) body += "<p>" + esc(s[3]) + "</p>";
+    if (s[4]) body += '<div class="perm">' + s[4].map(p => "<div><b>" + esc(p[0]) + "</b>" + esc(p[1]) + "</div>").join("") + "</div>";
+    if (i === t.s.length - 1) body += '<p><a href="' + ISSUES + '" rel="noopener">' + ISSUES.replace("https://", "") + "</a></p>";
+    return '<section><h2><span class="n">' + (i + 1) + "</span>" + esc(s[0]) + "</h2>" + body + "</section>";
+  }).join("");
+  $("langMenu").querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.lang === code));
+}
+
+function setLang(code) {
+  try { localStorage.setItem("privacy-lang", code); } catch (e) {}
+  const u = new URL(location.href);
+  u.searchParams.set("lang", code);
+  history.replaceState(null, "", u);
+  render(code);
+}
+
+const menu = $("langMenu"), btn = $("langBtn");
+menu.innerHTML = ORDER.map(c =>
+  '<button role="option" data-lang="' + c + '" lang="' + c + '"><span>' + esc(L[c].name) + '</span><span class="cur">' + L[c].cur + "</span></button>").join("");
+function toggle(open) { menu.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
+btn.addEventListener("click", e => { e.stopPropagation(); toggle(!menu.classList.contains("open")); });
+menu.addEventListener("click", e => { const b = e.target.closest("button"); if (b) { setLang(b.dataset.lang); toggle(false); btn.focus(); } });
+document.addEventListener("click", () => toggle(false));
+document.addEventListener("keydown", e => { if (e.key === "Escape") toggle(false); });
+render(pick());
+</script>
+</body>
+</html>
