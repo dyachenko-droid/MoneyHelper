@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Денежный помощник</string>
+    <string name="widget_balance_desc">Баланс и быстрый скан чека</string>
+    <string name="widget_budget_desc">Остаток бюджета и последние траты</string>
+</resources>
