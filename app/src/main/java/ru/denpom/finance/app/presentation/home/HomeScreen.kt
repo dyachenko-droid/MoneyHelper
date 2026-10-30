@@ -213,32 +213,34 @@ private fun BudgetRing(state: HomeState, onBudgets: () -> Unit) {
     val ratio = if (limit != null && limit > 0) state.spent.toFloat() / limit else 0f
     val arcColor = if (limit == null) c.pri else budgetColor(ratio)
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Box(Modifier.size(240.dp).clip(CircleShape).clickable(onClick = onBudgets), contentAlignment = Alignment.Center) {
-            Canvas(Modifier.fillMaxSize()) {
-                val stroke = 16.dp.toPx()
-                val inset = stroke / 2
-                val arcSize = Size(size.width - stroke, size.height - stroke)
-                drawArc(c.s3, 135f, 270f, false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Butt))
-                if (ratio > 0f) drawArc(arcColor, 135f, 270f * ratio.coerceAtMost(1f), false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Butt))
-                val angle = Math.toRadians((135f + 270f * state.monthProgress).toDouble())
-                val r = size.width / 2 - stroke / 2
-                val center = Offset(size.width / 2, size.height / 2)
-                drawCircle(c.on.copy(alpha = 0.4f), 3.dp.toPx(), center + Offset((r * cos(angle)).toFloat(), (r * sin(angle)).toFloat()))
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (limit == null) {
-                    Text("Потрачено в ${Dates.monthPrepositional(state.month)}", style = AppText.caption, color = c.on2, textAlign = TextAlign.Center)
-                    Text(fmt.format(state.spent, false), style = AppText.ring, color = c.on)
-                    Text("Лимит не задан", style = AppText.caption, color = c.pri)
-                } else if (state.left >= 0) {
-                    Text("Осталось на ${Dates.monthName(state.month).lowercase()}", style = AppText.caption, color = c.on2)
-                    Text(fmt.format(state.left, false), style = AppText.ring, color = c.on)
-                    val perDay = state.left / state.daysLeft.coerceAtLeast(1)
-                    Text("на ${Dates.days(state.daysLeft.toLong())} · ≈ ${fmt.format(perDay, false)} в день", style = AppText.caption, color = c.on2)
-                } else {
-                    Text("Лимит превышен на", style = AppText.caption, color = c.on2)
-                    Text(fmt.format(-state.left, false), style = AppText.ring, color = c.exp)
-                    Text("до конца месяца ${Dates.days(state.daysLeft.toLong())}", style = AppText.caption, color = c.on2)
+        Box(Modifier.size(240.dp)) {
+            Box(Modifier.matchParentSize().clip(CircleShape).clickable(onClick = onBudgets), contentAlignment = Alignment.Center) {
+                Canvas(Modifier.fillMaxSize()) {
+                    val stroke = 16.dp.toPx()
+                    val inset = stroke / 2
+                    val arcSize = Size(size.width - stroke, size.height - stroke)
+                    drawArc(c.s3, 135f, 270f, false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Butt))
+                    if (ratio > 0f) drawArc(arcColor, 135f, 270f * ratio.coerceAtMost(1f), false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Butt))
+                    val angle = Math.toRadians((135f + 270f * state.monthProgress).toDouble())
+                    val r = size.width / 2 - stroke / 2
+                    val center = Offset(size.width / 2, size.height / 2)
+                    drawCircle(c.on.copy(alpha = 0.4f), 3.dp.toPx(), center + Offset((r * cos(angle)).toFloat(), (r * sin(angle)).toFloat()))
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    if (limit == null) {
+                        Text("Потрачено в ${Dates.monthPrepositional(state.month)}", style = AppText.caption, color = c.on2, textAlign = TextAlign.Center)
+                        Text(fmt.format(state.spent, false), style = AppText.ring, color = c.on)
+                        Text("Лимит не задан", style = AppText.caption, color = c.pri)
+                    } else if (state.left >= 0) {
+                        Text("Осталось на ${Dates.monthName(state.month).lowercase()}", style = AppText.caption, color = c.on2)
+                        Text(fmt.format(state.left, false), style = AppText.ring, color = c.on)
+                        val perDay = state.left / state.daysLeft.coerceAtLeast(1)
+                        Text("на ${Dates.days(state.daysLeft.toLong())} · ≈ ${fmt.format(perDay, false)} в день", style = AppText.caption, color = c.on2)
+                    } else {
+                        Text("Лимит превышен на", style = AppText.caption, color = c.on2)
+                        Text(fmt.format(-state.left, false), style = AppText.ring, color = c.exp)
+                        Text("до конца месяца ${Dates.days(state.daysLeft.toLong())}", style = AppText.caption, color = c.on2)
+                    }
                 }
             }
             if (limit != null) {
