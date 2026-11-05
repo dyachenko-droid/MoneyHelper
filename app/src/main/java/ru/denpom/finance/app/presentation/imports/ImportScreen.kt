@@ -177,7 +177,7 @@ fun ImportScreen(onBack: () -> Unit, viewModel: ImportViewModel = hiltViewModel(
                         val from = preview.rows.minOfOrNull { it.timestamp }
                         val to = preview.rows.maxOfOrNull { it.timestamp }
                         if (from != null && to != null) Text("${Dates.dayMonth(Period.dateOf(from))} – ${Dates.dayMonth(Period.dateOf(to))}", style = AppText.caption, color = c.on2)
-                        Text("Расходы ${fmt.format(-expenses.sumOf { it.amount }, false)} · доходы ${fmt.format(incomes.sumOf { it.amount }, false)}", style = AppText.caption, color = c.on)
+                        Text("Расходы ${fmt.format(-expenses.sumOf { it.amount })} · доходы ${fmt.format(incomes.sumOf { it.amount })}", style = AppText.caption, color = c.on)
                         if (preview.duplicates > 0) Text("Совпадений в файле и на выбранном счёте: ${preview.duplicates}", style = AppText.caption, color = c.warn)
                     }
                 }
@@ -198,7 +198,7 @@ fun ImportScreen(onBack: () -> Unit, viewModel: ImportViewModel = hiltViewModel(
                         Text("${report.encoding} · разделитель ${report.delimiter}", style = AppText.caption, color = c.on2)
                         report.reasons.forEach { (reason, count) -> Text("$reason: $count", style = AppText.caption, color = c.warn) }
                         report.issues.take(5).forEach { issue -> Text("Строка ${issue.line}: ${issue.reason}\n${issue.example}", style = AppText.caption, color = c.on2) }
-                        if (report.rejected > 20) Text("Примеры ограничены первыми 20 ошибками", style = AppText.caption, color = c.on2)
+                        if (report.rejected > 5) Text("Показаны первые 5 проблемных строк", style = AppText.caption, color = c.on2)
                     }
                 }
                 item { ToggleRow("Пропускать переводы и пополнения", state.skipTransfers, viewModel::setSkip) }

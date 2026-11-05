@@ -155,16 +155,16 @@ fun OperationsScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column(Modifier.weight(1f)) {
                             Text("Расходы", style = AppText.caption, color = c.on2)
-                            Text(fmt.format(totals.expenses, false), style = AppText.amount, color = c.exp)
+                            Text(fmt.format(totals.expenses), style = AppText.amount, color = c.exp)
                         }
                         Column(Modifier.weight(1f)) {
                             Text("Доходы", style = AppText.caption, color = c.on2)
-                            Text(fmt.format(totals.income, false), style = AppText.amount, color = c.inc)
+                            Text(fmt.format(totals.income), style = AppText.amount, color = c.inc)
                         }
                     }
                     if (totals.transferCount > 0) {
-                        Text("Переводы: ${totals.transferCount} · ${fmt.format(totals.transferAmount, false)}", style = AppText.caption, color = c.on2)
-                        if (state.filter.accountId != null) Text("На счёт ${fmt.format(totals.transferIn, false)} · со счёта ${fmt.format(totals.transferOut, false)}", style = AppText.caption, color = c.on2)
+                        Text("Переводы: ${totals.transferCount} · ${fmt.format(totals.transferAmount)}", style = AppText.caption, color = c.on2)
+                        if (state.filter.accountId != null) Text("На счёт ${fmt.format(totals.transferIn)} · со счёта ${fmt.format(totals.transferOut)}", style = AppText.caption, color = c.on2)
                     }
                     Text("Изменение по выборке: ${fmt.signed(totals.net)}", style = AppText.bodyMedium, color = c.on)
                 }
