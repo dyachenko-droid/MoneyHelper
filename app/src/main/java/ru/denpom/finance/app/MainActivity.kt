@@ -6,13 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.denpom.finance.app.domain.model.ThemeMode
 import ru.denpom.finance.app.presentation.theme.MoneyTheme
-import ru.denpom.finance.app.presentation.launch.StartupGate
-import ru.denpom.finance.app.presentation.launch.StartupViewModel
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -27,7 +24,6 @@ import ru.denpom.finance.app.widget.ACTION_SCAN
 class MainActivity : FragmentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
-    private val startup: StartupViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -38,7 +34,6 @@ class MainActivity : FragmentActivity() {
             override fun onStop(owner: LifecycleOwner) = viewModel.onBackground()
         })
         setContent {
-            val startupState by startup.state.collectAsStateWithLifecycle()
             val settings by viewModel.settings.collectAsStateWithLifecycle()
             val systemDark = isSystemInDarkTheme()
             val dark = when (settings?.theme) {
@@ -46,11 +41,8 @@ class MainActivity : FragmentActivity() {
                 ThemeMode.DARK -> true
                 else -> systemDark
             }
-            LaunchedEffect(startupState) { startup.onScreenVisible() }
             MoneyTheme(dark) {
-                StartupGate(startupState, startup::acceptPrivacy) {
-                    MoneyRoot(systemDark = systemDark, viewModel = viewModel)
-                }
+                MoneyRoot(systemDark = systemDark, viewModel = viewModel)
             }
         }
         window.hideSystemBars()

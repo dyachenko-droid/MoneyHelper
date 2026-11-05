@@ -2,9 +2,4 @@
     <string name="app_name">Денежный помощник</string>
     <string name="widget_balance_desc">Баланс и быстрый скан чека</string>
     <string name="widget_budget_desc">Остаток бюджета и последние траты</string>
-    <string name="startup_loading">Загружаем Денежный помощник…</string>
-    <string name="startup_accept">Принять</string>
-    <string name="startup_page_error">Не удалось открыть страницу</string>
-    <string name="startup_page_retry_hint">Проверьте подключение к интернету и попробуйте ещё раз.</string>
-    <string name="startup_retry">Повторить</string>
 </resources>
