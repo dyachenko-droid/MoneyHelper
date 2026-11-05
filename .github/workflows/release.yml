@@ -43,7 +43,7 @@ jobs:
       - name: Check source direction controls
         run: python3 scripts/check-bidi.py
 
-      - name: Validate native app
+      - name: Validate app
         run: ./gradlew :app:testDebugUnitTest :app:lintRelease --no-daemon --stacktrace
 
       - name: Build release APK and AAB

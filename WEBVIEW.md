@@ -70,3 +70,6 @@ JAVA_HOME='/Applications/Android Studio.app/Contents/jbr/Contents/Home' ./gradle
 Подписанный релиз запускается прежним workflow `release.yml` для `codex/webview`.
 Перед сборкой выполняются все JVM-тесты, Lint и проверка Unicode; ключи берутся
 из repository secrets и не добавляются в исходники.
+
+При переносе прошли все 81 JVM-тест, `assembleDebug`, `assembleDebugAndroidTest`
+и `lintDebug` без ошибок. В проверенном манифесте — версия 1.2.0 (3) и INTERNET.

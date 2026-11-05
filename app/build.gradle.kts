@@ -27,8 +27,8 @@ android {
         minSdk = 26
         targetSdk = 36
         testInstrumentationRunner = "ru.denpom.finance.app.IsolatedTestRunner"
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
         resValue("bool", "firebase_messaging_enabled", firebaseConfigured.toString())
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
