@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import ru.denpom.finance.app.domain.model.TypeFilter
 import ru.denpom.finance.app.domain.model.Operation
 import ru.denpom.finance.app.presentation.LocalAppActions
 import ru.denpom.finance.app.presentation.components.CategoryAvatar
@@ -147,6 +148,27 @@ fun OperationsScreen(
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            if (state.loaded && state.hasAny) item {
+                val totals = state.summary
+                Column(Modifier.fillMaxWidth().card().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Найдено операций: ${totals.count}", style = AppText.caption, color = c.on2)
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Расходы", style = AppText.caption, color = c.on2)
+                            Text(fmt.format(totals.expenses, false), style = AppText.amount, color = c.exp)
+                        }
+                        Column(Modifier.weight(1f)) {
+                            Text("Доходы", style = AppText.caption, color = c.on2)
+                            Text(fmt.format(totals.income, false), style = AppText.amount, color = c.inc)
+                        }
+                    }
+                    if (totals.transferCount > 0) {
+                        Text("Переводы: ${totals.transferCount} · ${fmt.format(totals.transferAmount, false)}", style = AppText.caption, color = c.on2)
+                        if (state.filter.accountId != null) Text("На счёт ${fmt.format(totals.transferIn, false)} · со счёта ${fmt.format(totals.transferOut, false)}", style = AppText.caption, color = c.on2)
+                    }
+                    Text("Изменение по выборке: ${fmt.signed(totals.net)}", style = AppText.bodyMedium, color = c.on)
+                }
+            }
             items(state.groups, key = { it.date.toEpochDay() }) { group ->
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.padding(horizontal = 4.dp)) {
@@ -193,7 +215,7 @@ fun OperationsScreen(
             if (state.loaded && state.groups.isEmpty()) {
                 item {
                     if (state.hasAny) {
-                        EmptyState(Icons.Rounded.SearchOff, "Ничего не нашлось", "Попробуйте другое слово или сбросьте фильтры", action = "Сбросить фильтры", onAction = viewModel::reset)
+                        EmptyState(Icons.Rounded.SearchOff, "Ничего не нашлось", "Измените запрос или покажите операции за всё время", action = "Показать все операции", onAction = viewModel::reset)
                     } else {
                         EmptyState(Icons.Rounded.ReceiptLong, "Операций пока нет", "Отсканируйте чек или добавьте расход — он появится здесь")
                     }

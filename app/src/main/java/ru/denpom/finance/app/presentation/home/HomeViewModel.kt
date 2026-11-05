@@ -21,6 +21,8 @@ import ru.denpom.finance.app.domain.repository.OperationRepository
 import ru.denpom.finance.app.domain.repository.RecurringRepository
 import ru.denpom.finance.app.domain.repository.SettingsRepository
 import ru.denpom.finance.app.domain.usecase.SpendingCalculator
+import ru.denpom.finance.app.domain.usecase.BudgetPlanner
+import ru.denpom.finance.app.domain.usecase.BudgetPlan
 import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
@@ -38,6 +40,7 @@ data class HomeState(
     val forecast: Long = 0,
     val upcoming: List<Recurring> = emptyList(),
     val upcomingTotal: Long = 0,
+    val plan: BudgetPlan = BudgetPlan(0, 0, null, null),
     val insight: String? = null,
     val recent: List<Operation> = emptyList(),
     val categories: Map<Long, Category> = emptyMap(),
@@ -102,6 +105,7 @@ class HomeViewModel @Inject constructor(
             forecast = calc.forecast(spent, month, today),
             upcoming = upcoming.take(3),
             upcomingTotal = upcoming.filter { it.nextDate < monthEnd }.sumOf { it.amount },
+            plan = BudgetPlanner.calculate(input.limit, spent, input.recurring, input.operations, today),
             insight = insight(input.operations, cats, month, today),
             recent = input.operations.take(5),
             categories = cats,

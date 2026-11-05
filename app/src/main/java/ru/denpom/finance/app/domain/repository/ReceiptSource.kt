@@ -16,5 +16,5 @@ interface QrImageDecoder {
 }
 
 interface StatementReader {
-    suspend fun read(source: String): List<ru.denpom.finance.app.domain.model.StatementRow>
+    suspend fun read(source: String, options: ru.denpom.finance.app.domain.model.CsvOptions): ru.denpom.finance.app.domain.model.StatementReport
 }

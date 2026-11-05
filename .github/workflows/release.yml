@@ -40,6 +40,12 @@ jobs:
             echo "keyPassword=$KEY_PASSWORD"
           } > keystore.properties
 
+      - name: Check source direction controls
+        run: python3 scripts/check-bidi.py
+
+      - name: Validate native app
+        run: ./gradlew :app:testDebugUnitTest :app:lintRelease --no-daemon --stacktrace
+
       - name: Build release APK and AAB
         run: |
           chmod +x gradlew

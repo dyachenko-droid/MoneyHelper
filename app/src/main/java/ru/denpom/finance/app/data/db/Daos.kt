@@ -117,6 +117,12 @@ interface OperationDao {
     suspend fun clearCategory(categoryId: Long)
 
     @Transaction
+    suspend fun saveBatch(entities: List<OperationEntity>, splits: List<List<SplitEntity>>) {
+        require(entities.size == splits.size)
+        entities.forEachIndexed { i, entity -> saveWithSplits(entity, splits[i]) }
+    }
+
+    @Transaction
     suspend fun saveWithSplits(entity: OperationEntity, splits: List<SplitEntity>): Long {
         val id = if (entity.id == 0L) insert(entity) else {
             upsert(entity)

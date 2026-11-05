@@ -28,6 +28,11 @@ class OperationRepositoryImpl @Inject constructor(
             operation.splits.map { SplitEntity(operationId = operation.id, categoryId = it.categoryId, amount = it.amount) },
         )
 
+    override suspend fun saveAll(operations: List<Operation>) = dao.saveBatch(
+        operations.map { it.toEntity() },
+        operations.map { op -> op.splits.map { SplitEntity(operationId = op.id, categoryId = it.categoryId, amount = it.amount) } },
+    )
+
     override suspend fun delete(id: Long) = dao.delete(id)
 
     override suspend fun restore(operation: Operation) {

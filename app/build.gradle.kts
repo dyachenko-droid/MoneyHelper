@@ -22,8 +22,9 @@ android {
         applicationId = "ru.denpom.finance.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        testInstrumentationRunner = "ru.denpom.finance.app.IsolatedTestRunner"
+        versionCode = 2
+        versionName = "1.1.0"
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
@@ -57,6 +58,12 @@ android {
     buildFeatures {
         compose = true
         resValues = true
+        buildConfig = true
+    }
+    lint {
+        // Kotlin 2.4 UAST loops in KotlinUFile.getAllCommentsInFile for this check.
+        // Equivalent direction-control scan runs in scripts/check-bidi.py and CI.
+        disable += "BidiSpoofing"
     }
     androidResources {
         noCompress += "traineddata"
@@ -69,6 +76,8 @@ ksp {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.android)
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 
