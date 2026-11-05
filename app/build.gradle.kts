@@ -1,6 +1,7 @@
 import java.util.Properties
 
 plugins {
+    alias(libs.plugins.google.services)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
@@ -11,6 +12,9 @@ val keystoreProps = Properties().apply {
     val propsFile = rootProject.file("keystore.properties")
     if (propsFile.exists()) load(propsFile.inputStream().reader(Charsets.UTF_8))
 }
+
+val firebaseConfigured = !providers.fileContents(layout.projectDirectory.file("google-services.json"))
+    .asText.get().contains("moneyhelper-placeholder")
 
 android {
     namespace = "ru.denpom.finance.app"
@@ -24,13 +28,17 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        resValue("bool", "firebase_messaging_enabled", firebaseConfigured.toString())
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
     }
 
+    val hasReleaseSigning = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+        .all { !keystoreProps.getProperty(it).isNullOrBlank() }
+
     signingConfigs {
-        create("release") {
+        if (hasReleaseSigning) create("release") {
             storeFile = file(keystoreProps["storeFile"] as String)
             storePassword = keystoreProps["storePassword"] as String
             keyAlias = keystoreProps["keyAlias"] as String
@@ -44,7 +52,7 @@ android {
                 enable = true
             }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -53,6 +61,7 @@ android {
     }
     buildFeatures {
         compose = true
+        resValues = true
     }
     androidResources {
         noCompress += "traineddata"
@@ -64,6 +73,17 @@ ksp {
 }
 
 dependencies {
+    implementation(libs.appsflyer)
+    implementation(libs.installreferrer)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.database)
+    implementation(libs.onesignal.notifications)
+    implementation(libs.onesignal.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

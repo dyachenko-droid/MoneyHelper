@@ -9,7 +9,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -52,7 +51,7 @@ private fun floatAnim(duration: Int = 2400): Float {
 fun ReceiptIllustration() {
     val c = App.colors
     val f = floatAnim()
-    BoxWithConstraints(Modifier.fillMaxSize().clip(RoundedCornerShape(28.dp)).background(c.s2)) {
+    Box(Modifier.fillMaxSize().clip(RoundedCornerShape(28.dp)).background(c.s2)) {
         Column(
             Modifier.align(Alignment.Center).offset(x = (-48).dp, y = (f * 6).dp).rotate(-4f).width(140.dp).card(RoundedCornerShape(14.dp)).padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),

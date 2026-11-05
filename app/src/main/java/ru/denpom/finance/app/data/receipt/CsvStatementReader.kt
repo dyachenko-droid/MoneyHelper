@@ -54,7 +54,7 @@ class CsvStatementReader @Inject constructor(
     }
 
     private fun decode(bytes: ByteArray): String {
-        val utf = String(bytes, Charsets.UTF_8).removePrefix("﻿")
+        val utf = String(bytes, Charsets.UTF_8).removePrefix("\uFEFF")
         return if (utf.contains('�')) String(bytes, Charset.forName("windows-1251")) else utf
     }
 

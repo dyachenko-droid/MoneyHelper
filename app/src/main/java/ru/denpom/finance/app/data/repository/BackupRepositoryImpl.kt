@@ -34,7 +34,7 @@ class BackupRepositoryImpl @Inject constructor(
         val accNames = accounts.observeAccounts().first().associate { it.id to it.name }
         val catNames = categories.categories().associate { it.id to it.name }
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-        val sb = StringBuilder("﻿")
+        val sb = StringBuilder("\uFEFF")
         sb.append("Дата;Тип;Сумма;Счёт;Счёт получателя;Категория;Название;Заметка\n")
         ops.sortedBy { it.timestamp }.forEach { op ->
             val date = Instant.ofEpochMilli(op.timestamp).atZone(Period.zone).format(formatter)
