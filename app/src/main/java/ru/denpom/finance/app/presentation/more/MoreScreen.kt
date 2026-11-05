@@ -103,6 +103,7 @@ fun MoreScreen(onNavigate: (String) -> Unit, viewModel: MoreViewModel = hiltView
                 SettingRow(Icons.Rounded.CloudUpload, "Бэкап и экспорт", "CSV, копия") { onNavigate(Routes.BACKUP) }
             }
         }
+        item { Text("Денежный помощник ${ru.denpom.finance.app.BuildConfig.VERSION_NAME}", style = AppText.caption, color = c.on2, modifier = Modifier.padding(horizontal = 4.dp)) }
     }
 
     if (currencyDialog) {

@@ -1,5 +1,6 @@
 package ru.denpom.finance.app.presentation.imports
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
+import ru.denpom.finance.app.domain.model.CsvOptions
+import ru.denpom.finance.app.domain.model.CsvEncoding
+import ru.denpom.finance.app.domain.model.CsvDelimiter
 import ru.denpom.finance.app.domain.model.Account
 import ru.denpom.finance.app.domain.model.ImportPreview
 import ru.denpom.finance.app.domain.model.Period
@@ -67,6 +73,9 @@ data class ImportState(
     val accountId: Long? = null,
     val skipTransfers: Boolean = true,
     val failed: Boolean = false,
+    val error: String? = null,
+    val options: CsvOptions = CsvOptions(),
+    val skipDuplicates: Boolean = true,
 )
 
 @HiltViewModel
@@ -78,33 +87,46 @@ class ImportViewModel @Inject constructor(
     val state: StateFlow<ImportState> = _state.asStateFlow()
     val accounts: StateFlow<List<Account>> = accounts.observeAccounts().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun load(uri: String) = viewModelScope.launch {
-        _state.update { it.copy(loading = true, failed = false) }
-        val preview = runCatching { importer.preview(uri) }.getOrNull()
-        _state.update {
-            it.copy(
-                loading = false,
-                preview = preview?.takeIf { p -> p.rows.isNotEmpty() },
-                failed = preview == null || preview.rows.isEmpty(),
-                accountId = it.accountId ?: accounts.value.firstOrNull()?.id,
-            )
+    private var source: String? = null
+    private var reading: Job? = null
+    fun load(uri: String) {
+        source = uri
+        reading?.cancel()
+        reading = viewModelScope.launch {
+            _state.update { it.copy(loading = true, error = null, preview = null, failed = false, accountId = it.accountId ?: accounts.value.firstOrNull()?.id) }
+            try {
+                val current = _state.value
+                val preview = importer.preview(uri, current.options, current.accountId)
+                _state.update { it.copy(loading = false, preview = preview) }
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) { _state.update { it.copy(loading = false, failed = true, error = e.message ?: "Не удалось прочитать файл") } }
         }
     }
 
-    fun setAccount(id: Long) = _state.update { it.copy(accountId = id) }
+    fun setOptions(options: CsvOptions) { _state.update { it.copy(options = options) }; source?.let(::load) }
+    fun setAccount(id: Long) {
+        _state.update { it.copy(accountId = id) }
+        source?.let(::load)
+    }
     fun setSkip(skip: Boolean) = _state.update { it.copy(skipTransfers = skip) }
+    fun setDuplicates(skip: Boolean) = _state.update { it.copy(skipDuplicates = skip) }
 
     fun commit(onDone: (Int) -> Unit) {
         val s = _state.value
+        if (s.loading) return
         val preview = s.preview ?: return
         val accountId = s.accountId ?: return
         viewModelScope.launch {
-            _state.update { it.copy(loading = true) }
-            val n = importer.commit(preview.rows, accountId, s.skipTransfers)
-            _state.value = ImportState(accountId = accountId)
-            onDone(n)
+            _state.update { it.copy(loading = true, error = null) }
+            try {
+                val n = importer.commit(preview.rows, accountId, s.skipTransfers, s.skipDuplicates)
+                _state.value = ImportState(accountId = accountId)
+                onDone(n)
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) { _state.update { it.copy(loading = false, error = "Импорт отменён целиком. " + (e.message ?: "Ошибка записи")) } }
         }
     }
+
 }
 
 @Composable
@@ -116,14 +138,22 @@ fun ImportScreen(onBack: () -> Unit, viewModel: ImportViewModel = hiltViewModel(
     val actions = LocalAppActions.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { viewModel.load(it.toString()) } }
 
+    BackHandler(enabled = state.loading) {}
     Column(Modifier.fillMaxSize().statusBarsPadding().displayCutoutPadding()) {
-        BackTopBar("Импорт выписки", onBack)
+        BackTopBar("Импорт выписки", { if (!state.loading) onBack() })
         val preview = state.preview
         LazyColumn(
             Modifier.weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CsvChoice("Кодировка", state.options.encoding.label, CsvEncoding.entries.map { it.label }, !state.loading) { i -> viewModel.setOptions(state.options.copy(encoding = CsvEncoding.entries[i])) }
+                    CsvChoice("Разделитель", state.options.delimiter.label, CsvDelimiter.entries.map { it.label }, !state.loading) { i -> viewModel.setOptions(state.options.copy(delimiter = CsvDelimiter.entries[i])) }
+                    state.error?.let { Text(it, style = AppText.caption, color = c.exp) }
+                }
+            }
             if (state.loading) {
                 item { Box(Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = c.pri) } }
             } else if (preview == null) {
@@ -144,11 +174,11 @@ fun ImportScreen(onBack: () -> Unit, viewModel: ImportViewModel = hiltViewModel(
                 item {
                     Column(Modifier.card().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text("${rows.size} ${Dates.plural(rows.size.toLong(), "операция", "операции", "операций")}", style = AppText.title.copy(fontSize = 20.sp), color = c.on)
-                        val from = preview.rows.minOf { it.timestamp }
-                        val to = preview.rows.maxOf { it.timestamp }
-                        Text("${Dates.dayMonth(Period.dateOf(from))} – ${Dates.dayMonth(Period.dateOf(to))}", style = AppText.caption, color = c.on2)
+                        val from = preview.rows.minOfOrNull { it.timestamp }
+                        val to = preview.rows.maxOfOrNull { it.timestamp }
+                        if (from != null && to != null) Text("${Dates.dayMonth(Period.dateOf(from))} – ${Dates.dayMonth(Period.dateOf(to))}", style = AppText.caption, color = c.on2)
                         Text("Расходы ${fmt.format(-expenses.sumOf { it.amount }, false)} · доходы ${fmt.format(incomes.sumOf { it.amount }, false)}", style = AppText.caption, color = c.on)
-                        if (preview.duplicates > 0) Text("Уже есть в приложении и будут пропущены: ${preview.duplicates}", style = AppText.caption, color = c.warn)
+                        if (preview.duplicates > 0) Text("Совпадений в файле и на выбранном счёте: ${preview.duplicates}", style = AppText.caption, color = c.warn)
                     }
                 }
                 item {
@@ -161,7 +191,20 @@ fun ImportScreen(onBack: () -> Unit, viewModel: ImportViewModel = hiltViewModel(
                         }
                     }
                 }
+                item {
+                    Column(Modifier.card().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        val report = preview.report
+                        Text("Прочитано ${report.total} · распознано ${report.rows.size} · отклонено ${report.rejected}", style = AppText.body, color = c.on)
+                        Text("${report.encoding} · разделитель ${report.delimiter}", style = AppText.caption, color = c.on2)
+                        report.reasons.forEach { (reason, count) -> Text("$reason: $count", style = AppText.caption, color = c.warn) }
+                        report.issues.take(5).forEach { issue -> Text("Строка ${issue.line}: ${issue.reason}\n${issue.example}", style = AppText.caption, color = c.on2) }
+                        if (report.rejected > 20) Text("Примеры ограничены первыми 20 ошибками", style = AppText.caption, color = c.on2)
+                    }
+                }
                 item { ToggleRow("Пропускать переводы и пополнения", state.skipTransfers, viewModel::setSkip) }
+                item { ToggleRow("Пропускать совпадающие операции", state.skipDuplicates, viewModel::setDuplicates) }
+                item { Text("Совпадение — одинаковые дата, сумма и название на выбранном счёте. Если это разные покупки, отключите пропуск. Переводы при отключённом пропуске учитываются как приход или расход по выписке.", style = AppText.caption, color = c.on2) }
+                item { FilterChip("Выбрать другой файл") { picker.launch(arrayOf("*/*")) } }
                 item {
                     Column(Modifier.card(RoundedCornerShape(20.dp)).padding(vertical = 4.dp)) {
                         rows.take(30).forEach { row ->
@@ -179,11 +222,25 @@ fun ImportScreen(onBack: () -> Unit, viewModel: ImportViewModel = hiltViewModel(
             }
         }
         if (preview != null && !state.loading) {
-            PrimaryButton("Импортировать", Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp), enabled = state.accountId != null) {
+            PrimaryButton("Импортировать", Modifier.fillMaxWidth().navigationBarsPadding().padding(16.dp), enabled = state.accountId != null && preview.rows.isNotEmpty()) {
                 viewModel.commit { n ->
                     actions.snack(if (n > 0) "Добавлено $n ${Dates.plural(n.toLong(), "операция", "операции", "операций")}" else "Новых операций не нашлось")
                     onBack()
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CsvChoice(label: String, value: String, values: List<String>, enabled: Boolean, onSelect: (Int) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(label, style = AppText.caption, color = App.colors.on2)
+        Box {
+            FilterChip(value) { if (enabled) expanded = true }
+            DropdownMenu(expanded, { expanded = false }) {
+                values.forEachIndexed { index, text -> DropdownMenuItem({ Text(text) }, { expanded = false; onSelect(index) }) }
             }
         }
     }

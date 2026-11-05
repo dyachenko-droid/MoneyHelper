@@ -2,6 +2,10 @@ package ru.denpom.finance.app.domain.usecase
 
 import ru.denpom.finance.app.domain.model.CategoryKind
 import ru.denpom.finance.app.domain.model.ImportPreview
+import ru.denpom.finance.app.domain.model.CsvOptions
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import javax.inject.Singleton
 import ru.denpom.finance.app.domain.model.Operation
 import ru.denpom.finance.app.domain.model.OperationType
 import ru.denpom.finance.app.domain.model.Period
@@ -13,12 +17,15 @@ import ru.denpom.finance.app.domain.repository.StatementReader
 import javax.inject.Inject
 import kotlin.math.abs
 
+@Singleton
 class ImportStatementUseCase @Inject constructor(
     private val reader: StatementReader,
     private val operations: OperationRepository,
     private val categories: CategoryRepository,
     private val categorize: CategorizeItemsUseCase,
 ) {
+
+    private val mutex = Mutex()
 
     private val bankMap = listOf(
         "shopping_basket" to listOf("супермаркет", "продукт"),
@@ -36,22 +43,28 @@ class ImportStatementUseCase @Inject constructor(
         "chair" to listOf("жкх", "коммунал", "хозтовары"),
     )
 
-    suspend fun preview(source: String): ImportPreview {
-        val rows = reader.read(source)
-        val existing = operations.all().map { key(it.timestamp, it.signedAmount, it.title) }.toSet()
-        return ImportPreview(rows, rows.count { key(it.timestamp, it.amount, it.description) in existing })
+    suspend fun preview(source: String, options: CsvOptions, accountId: Long?): ImportPreview {
+        val report = reader.read(source, options)
+        return ImportPreview(report, duplicates(report.rows, accountId))
     }
 
-    suspend fun commit(rows: List<StatementRow>, accountId: Long, skipTransfers: Boolean): Int {
-        val existing = operations.all().map { key(it.timestamp, it.signedAmount, it.title) }.toMutableSet()
+    suspend fun duplicates(rows: List<StatementRow>, accountId: Long?): Int {
+        val existing = operations.all().filter { it.accountId == accountId && it.type != OperationType.TRANSFER }
+            .map { key(it.timestamp, it.signedAmount, it.title) }.toMutableSet()
+        return rows.count { !existing.add(key(it.timestamp, it.amount, title(it))) }
+    }
+
+    suspend fun commit(rows: List<StatementRow>, accountId: Long, skipTransfers: Boolean, skipDuplicates: Boolean): Int = mutex.withLock {
+        val existing = operations.all().filter { it.accountId == accountId && it.type != OperationType.TRANSFER }
+            .map { key(it.timestamp, it.signedAmount, it.title) }.toMutableSet()
         val cats = categories.categories()
         val expense = cats.filter { it.kind == CategoryKind.EXPENSE }
         val income = cats.filter { it.kind == CategoryKind.INCOME }
-        var count = 0
+        val pending = mutableListOf<Operation>()
         rows.forEach { row ->
             if (skipTransfers && row.isTransfer) return@forEach
-            val k = key(row.timestamp, row.amount, row.description)
-            if (!existing.add(k)) return@forEach
+            val k = key(row.timestamp, row.amount, title(row))
+            if (skipDuplicates && !existing.add(k)) return@forEach
             val isIncome = row.amount > 0
             val categoryId = if (isIncome) {
                 val lower = (row.bankCategory + " " + row.description).lowercase()
@@ -63,11 +76,11 @@ class ImportStatementUseCase @Inject constructor(
             } else {
                 val lower = row.bankCategory.lowercase()
                 bankMap.firstOrNull { (_, words) -> words.any { lower.contains(it) } }?.let { (icon, _) -> expense.firstOrNull { it.icon == icon }?.id }
-                    ?: categorize.categoryForTitle(row.description)
+                    ?: categorize.categoryForTitle(row.description, cats)
                     ?: expense.firstOrNull { it.icon == "shopping_bag" }?.id
             }
             val amount = abs(row.amount)
-            operations.save(
+            pending.add(
                 Operation(
                     id = 0,
                     type = if (isIncome) OperationType.INCOME else OperationType.EXPENSE,
@@ -75,18 +88,21 @@ class ImportStatementUseCase @Inject constructor(
                     accountId = accountId,
                     toAccountId = null,
                     categoryId = categoryId,
-                    title = row.description.ifBlank { row.bankCategory.ifBlank { "Операция" } },
+                    title = title(row),
                     note = "",
                     timestamp = row.timestamp,
                     receiptId = null,
                     splits = categoryId?.let { listOf(Split(it, amount)) }.orEmpty(),
                 )
             )
-            count++
+
         }
-        return count
+        operations.saveAll(pending)
+        pending.size
     }
 
+    private fun title(row: StatementRow) = row.description.ifBlank { row.bankCategory.ifBlank { "Операция" } }
+
     private fun key(timestamp: Long, signed: Long, title: String) =
-        "${Period.dateOf(timestamp)}|$signed|${title.trim().lowercase()}"
+        "${Period.dateOf(timestamp)}|$signed|${title.trim().lowercase(java.util.Locale.ROOT)}"
 }

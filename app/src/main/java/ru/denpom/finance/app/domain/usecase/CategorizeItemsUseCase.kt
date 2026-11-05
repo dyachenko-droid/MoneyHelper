@@ -63,6 +63,9 @@ class CategorizeItemsUseCase @Inject constructor(
         return merchantCategory(title, all)
     }
 
+    fun categoryForTitle(title: String, all: List<Category>): Long? =
+        merchantCategory(title, all.filter { it.kind == CategoryKind.EXPENSE })
+
     private fun merchantCategory(shop: String, all: List<Category>): Long? {
         val lower = shop.lowercase()
         return merchants.firstOrNull { (_, names) -> names.any { lower.contains(it) } }?.let { all.byIcon(it.first) }

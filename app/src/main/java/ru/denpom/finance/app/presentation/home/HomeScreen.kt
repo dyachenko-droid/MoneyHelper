@@ -118,6 +118,17 @@ fun HomeScreen(
         }
         item { BudgetRing(state, onBudgets) }
         item {
+            Column(Modifier.fillMaxWidth().card().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("До конца месяца", style = AppText.section, color = c.on)
+                Text("Регулярные платежи: ${state.plan.paymentCount} · ${fmt.format(state.plan.reserved)}", style = AppText.body, color = c.on)
+                Text("Ещё не учтены в расходах. Включены все оставшиеся даты подписок и регулярных платежей.", style = AppText.caption, color = c.on2)
+                state.plan.available?.let { available ->
+                    Text("После этих платежей: ${fmt.format(available)}", style = AppText.body, color = if (available < 0) c.exp else c.on)
+                    Text("Доступно в день: ${fmt.format(state.plan.daily ?: 0)}", style = AppText.section, color = c.pri)
+                } ?: Text("Задайте лимит бюджета, чтобы увидеть доступную сумму на день", style = AppText.caption, color = c.on2)
+            }
+        }
+        item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(
                     Modifier.weight(1f).height(48.dp).clip(RoundedCornerShape(24.dp)).background(c.pri).clickable(onClick = onScan),
@@ -234,8 +245,8 @@ private fun BudgetRing(state: HomeState, onBudgets: () -> Unit) {
                     } else if (state.left >= 0) {
                         Text("Осталось на ${Dates.monthName(state.month).lowercase()}", style = AppText.caption, color = c.on2)
                         Text(fmt.format(state.left, false), style = AppText.ring, color = c.on)
-                        val perDay = state.left / state.daysLeft.coerceAtLeast(1)
-                        Text("на ${Dates.days(state.daysLeft.toLong())} · ≈ ${fmt.format(perDay, false)} в день", style = AppText.caption, color = c.on2)
+                        val perDay = state.plan.daily ?: 0
+                        Text("≈ ${fmt.format(perDay, false)} в день с учётом платежей", style = AppText.caption, color = c.on2)
                     } else {
                         Text("Лимит превышен на", style = AppText.caption, color = c.on2)
                         Text(fmt.format(-state.left, false), style = AppText.ring, color = c.exp)
