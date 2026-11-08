@@ -2,6 +2,7 @@ package ru.denpom.finance.app.presentation
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import ru.denpom.finance.app.domain.model.OperationType
+import ru.denpom.finance.app.domain.model.OperationTemplate
 
 data class AddRequest(
     val type: OperationType = OperationType.EXPENSE,
@@ -10,6 +11,7 @@ data class AddRequest(
     val note: String = "",
     val timestamp: Long? = null,
     val editId: Long? = null,
+    val template: OperationTemplate? = null,
 )
 
 data class Snack(val text: String, val action: String? = null, val onAction: (() -> Unit)? = null, val id: Long = System.nanoTime())

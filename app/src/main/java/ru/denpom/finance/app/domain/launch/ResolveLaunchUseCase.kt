@@ -26,7 +26,11 @@ class ResolveLaunchUseCase(
         }
         if (!raw.isNullOrEmpty()) {
             val finalUrl = if (install.kind == InstallKind.PAID) {
-                composer(raw, attributionRepository.appsFlyerId, install.campaign)
+                val uid = attributionRepository.appsFlyerId
+                val deviceId = if (install.advertisingId == null) safely {
+                    withTimeoutOrNull(timeouts.advertisingId) { attributionRepository.deviceAdvertisingId() }
+                } else null
+                composer(raw, uid, install, deviceId)
             } else raw
             preferences.completeFirstLaunch(finalUrl, fromFirebase = true)
             return LaunchDestination.Web(finalUrl, false)

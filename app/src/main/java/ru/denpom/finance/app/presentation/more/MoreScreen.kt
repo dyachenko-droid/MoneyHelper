@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
+import androidx.compose.material.icons.rounded.Assessment
 import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Category
@@ -78,6 +81,9 @@ fun MoreScreen(onNavigate: (String) -> Unit, viewModel: MoreViewModel = hiltView
         item {
             Column(Modifier.card().padding(vertical = 8.dp)) {
                 SettingRow(Icons.Rounded.Insights, "Аналитика", "") { onNavigate(Routes.ANALYTICS) }
+                SettingRow(Icons.Rounded.Assessment, "Отчёт за месяц", "") { onNavigate(Routes.MONTHLY_REPORT) }
+                SettingRow(Icons.Rounded.CalendarMonth, "Календарь платежей", "") { onNavigate(Routes.PAYMENTS) }
+                SettingRow(Icons.AutoMirrored.Rounded.PlaylistAdd, "Шаблоны операций", "") { onNavigate(Routes.TEMPLATES) }
                 SettingRow(Icons.Rounded.AccountBalance, "Счета", state.accounts.toString()) { onNavigate(Routes.ACCOUNTS) }
                 SettingRow(Icons.Rounded.Autorenew, "Подписки и платежи", state.recurring.takeIf { it > 0 }?.toString().orEmpty()) { onNavigate(Routes.SUBSCRIPTIONS) }
                 SettingRow(Icons.Rounded.Savings, "Цели-копилки", "") { onNavigate(Routes.GOALS) }

@@ -20,10 +20,13 @@ import androidx.room.RoomDatabase
         DebtEntity::class,
         DebtPaymentEntity::class,
         LoanEntity::class,
+        PaymentOccurrenceEntity::class,
+        BalanceCheckEntity::class,
+        OperationTemplateEntity::class,
     ],
-    version = 2,
+    version = AppDatabase.VERSION,
     exportSchema = true,
-    autoMigrations = [AutoMigration(from = 1, to = 2)],
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
@@ -35,7 +38,12 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun goalDao(): GoalDao
     abstract fun debtDao(): DebtDao
 
+    abstract fun paymentOccurrenceDao(): PaymentOccurrenceDao
+    abstract fun balanceCheckDao(): BalanceCheckDao
+    abstract fun operationTemplateDao(): OperationTemplateDao
+
     companion object {
+        const val VERSION = 3
         const val NAME = "money.db"
     }
 }

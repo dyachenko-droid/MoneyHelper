@@ -68,6 +68,18 @@ class ResolveAttributionUseCaseTest {
         assertTrue(cancelled)
     }
 
+    @Test fun sdkPaidFieldsOverrideGcdAndFillMissingFieldsFromIt() = runTest {
+        val repo = FakeAttributionRepository(InstallAttribution(InstallKind.ORGANIC))
+        repo.refresh = {
+            repo.updates.value = InstallAttribution(InstallKind.PAID, "sdk", mapOf("af_ad_id" to "1"))
+            InstallAttribution(InstallKind.PAID, "server", mapOf("ad_id" to "2", "adset_id" to "3"))
+        }
+        val selected = ResolveAttributionUseCase(repo)()
+        assertEquals("https://example.test?ad=1&set=3&sub1=sdk&app_id=uid",
+            PaidLinkComposer()("https://example.test?ad={{ad.id}}&set={{adset.id}}", "uid", selected))
+
+    }
+
     @Test fun missingSdkResultCanBeRecoveredFromGcdAt10Seconds() = runTest {
         val repo = FakeAttributionRepository()
         val expected = InstallAttribution(InstallKind.PAID, "gcd_campaign")

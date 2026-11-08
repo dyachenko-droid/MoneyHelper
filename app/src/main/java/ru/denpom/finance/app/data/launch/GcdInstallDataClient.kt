@@ -12,7 +12,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import ru.denpom.finance.app.domain.launch.InstallAttribution
-import ru.denpom.finance.app.domain.launch.InstallKind
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,8 +36,10 @@ class GcdInstallDataClient @Inject constructor() {
                     }
                     connection.set(request)
                     if (!continuation.isActive) return@submit
-                    val data = if (request.responseCode in 200..299) {
-                        request.inputStream.bufferedReader(Charsets.UTF_8).use { parseInstallData(it.readText()) }
+                    val code = request.responseCode
+                    val data = if (code in 200..299) {
+                        val body = request.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                        parseInstallData(body)
                     } else null
                     if (continuation.isActive) continuation.resume(data)
                 } catch (_: Exception) {
@@ -57,6 +58,8 @@ class GcdInstallDataClient @Inject constructor() {
 
 internal fun parseInstallData(body: String): InstallAttribution? = try {
     val data = Json.parseToJsonElement(body).jsonObject
-    val kind = InstallKind.from((data["af_status"] as? JsonPrimitive)?.contentOrNull)
-    kind?.let { InstallAttribution(it, (data["campaign"] as? JsonPrimitive)?.contentOrNull) }
+    val fields = data.mapNotNull { (key, value) ->
+        (value as? JsonPrimitive)?.contentOrNull?.let { key to it }
+    }.toMap()
+    InstallAttribution.from(fields)
 } catch (_: Exception) { null }

@@ -19,6 +19,10 @@ object Routes {
     const val SECURITY = "security"
     const val REMINDERS = "reminders"
     const val IMPORT = "import"
+    const val PAYMENTS = "payments"
+    const val RECONCILE = "reconcile"
+    const val TEMPLATES = "templates"
+    const val MONTHLY_REPORT = "monthly-report"
 
     fun receipt(id: Long) = "receipt/$id"
 

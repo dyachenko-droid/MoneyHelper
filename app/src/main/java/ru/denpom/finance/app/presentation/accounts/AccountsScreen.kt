@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -61,7 +62,7 @@ import ru.denpom.finance.app.presentation.components.HideSystemBars
 private data class AccountEdit(val account: Account?)
 
 @Composable
-fun AccountsScreen(onBack: () -> Unit, viewModel: AccountsViewModel = hiltViewModel()) {
+fun AccountsScreen(onBack: () -> Unit, onReconcile: () -> Unit, viewModel: AccountsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val c = App.colors
     val fmt = Money.fmt
@@ -69,7 +70,9 @@ fun AccountsScreen(onBack: () -> Unit, viewModel: AccountsViewModel = hiltViewMo
     var edit by remember { mutableStateOf<AccountEdit?>(null) }
 
     Column(Modifier.fillMaxSize().statusBarsPadding().displayCutoutPadding()) {
-        BackTopBar("Счета", onBack)
+        BackTopBar("Счета", onBack) {
+            TextButton(onReconcile) { Text("Сверить") }
+        }
         LazyColumn(
             Modifier.weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),

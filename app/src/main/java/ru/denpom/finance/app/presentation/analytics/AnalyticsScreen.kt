@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -58,13 +59,15 @@ import ru.denpom.finance.app.presentation.theme.App
 import ru.denpom.finance.app.presentation.theme.AppText
 
 @Composable
-fun AnalyticsScreen(onBack: () -> Unit, viewModel: AnalyticsViewModel = hiltViewModel()) {
+fun AnalyticsScreen(onBack: () -> Unit, onMonthlyReport: () -> Unit, viewModel: AnalyticsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val c = App.colors
     val fmt = Money.fmt
 
     Column(Modifier.fillMaxSize().statusBarsPadding().displayCutoutPadding()) {
-        BackTopBar("Аналитика", onBack)
+        BackTopBar("Аналитика", onBack) {
+            TextButton(onMonthlyReport) { Text("Отчёт за месяц") }
+        }
         LazyColumn(
             Modifier.weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),

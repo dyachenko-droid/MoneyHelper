@@ -11,7 +11,9 @@ import kotlinx.coroutines.launch
 import ru.denpom.finance.app.domain.model.Account
 import ru.denpom.finance.app.domain.model.Category
 import ru.denpom.finance.app.domain.model.Operation
-import ru.denpom.finance.app.domain.model.OperationType
+import ru.denpom.finance.app.data.repository.PaymentCalendarRepository
+import ru.denpom.finance.app.domain.model.PaymentOccurrence
+import ru.denpom.finance.app.domain.usecase.PaymentSchedule
 import ru.denpom.finance.app.domain.model.Period
 import ru.denpom.finance.app.domain.model.Recurring
 import ru.denpom.finance.app.domain.repository.AccountRepository
@@ -56,6 +58,7 @@ class HomeViewModel @Inject constructor(
     categories: CategoryRepository,
     budgets: BudgetRepository,
     recurring: RecurringRepository,
+    calendar: PaymentCalendarRepository,
     private val settings: SettingsRepository,
     private val calc: SpendingCalculator,
 ) : ViewModel() {
@@ -68,7 +71,7 @@ class HomeViewModel @Inject constructor(
         recurring.observeRecurring(),
     ) { acc, ops, cats, buds, rec -> Inputs(acc, ops, cats, buds.firstOrNull { it.categoryId == null }?.limit, rec) }
 
-    val state: StateFlow<HomeState> = combine(base, settings.settings) { input, s -> build(input, s.userName) }
+    val state: StateFlow<HomeState> = combine(base, settings.settings, calendar.occurrences) { input, s, overrides -> build(input, s.userName, overrides) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
 
     fun toggleHide() {
@@ -83,15 +86,14 @@ class HomeViewModel @Inject constructor(
         val recurring: List<Recurring>,
     )
 
-    private fun build(input: Inputs, name: String): HomeState {
+    private fun build(input: Inputs, name: String, overrides: List<PaymentOccurrence>): HomeState {
         val today = LocalDate.now()
         val month = YearMonth.from(today)
         val spent = calc.totalSpent(input.operations, month)
         val cats = input.categories.associateBy { it.id }
-        val monthEnd = Period.startOf(month.plusMonths(1))
-        val upcoming = input.recurring
-            .filter { it.type == OperationType.EXPENSE && it.nextDate >= Period.startOfDay(today) }
-            .sortedBy { it.nextDate }
+        val upcoming = PaymentSchedule.pendingExpenses(input.recurring, overrides, input.operations, today, today.plusDays(29))
+            .map { it.rule.copy(nextDate = Period.startOfDay(it.occurrence.due)) }
+        val plan = BudgetPlanner.calculate(input.limit, spent, input.recurring, input.operations, today, overrides)
         return HomeState(
             loaded = true,
             userName = name,
@@ -104,8 +106,8 @@ class HomeViewModel @Inject constructor(
             monthProgress = today.dayOfMonth.toFloat() / month.lengthOfMonth(),
             forecast = calc.forecast(spent, month, today),
             upcoming = upcoming.take(3),
-            upcomingTotal = upcoming.filter { it.nextDate < monthEnd }.sumOf { it.amount },
-            plan = BudgetPlanner.calculate(input.limit, spent, input.recurring, input.operations, today),
+            upcomingTotal = plan.reserved,
+            plan = plan,
             insight = insight(input.operations, cats, month, today),
             recent = input.operations.take(5),
             categories = cats,

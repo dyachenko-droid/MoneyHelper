@@ -17,8 +17,8 @@ internal data class DatabaseSnapshot(val rows: Map<String, List<List<Any?>>>) {
 
 /** Copies records, never replaces or closes the application's live SQLite file. */
 internal class BackupDatabase(private val context: Context, private val db: AppDatabase) {
-    private val schemas = (1..2).associateWith { version -> JSONObject(context.assets.open("backup_schema/$version.json").bufferedReader().use { it.readText() }).getJSONObject("database") }
-    val tables: List<BackupTable> = schemaTables(2)
+    private val schemas = (1..AppDatabase.VERSION).associateWith { version -> JSONObject(context.assets.open("backup_schema/$version.json").bufferedReader().use { it.readText() }).getJSONObject("database") }
+    val tables: List<BackupTable> = schemaTables(AppDatabase.VERSION)
     private fun schemaTables(version: Int): List<BackupTable> {
         val entities = schemas.getValue(version).getJSONArray("entities")
         return (0 until entities.length()).map { n ->
@@ -63,17 +63,17 @@ internal class BackupDatabase(private val context: Context, private val db: AppD
                 tables.forEach { t -> output.execSQL(t.createSql); t.indices.forEach(output::execSQL) }
                 insert(data) { sql, args -> output.execSQL(sql, args) }
                 output.execSQL("CREATE TABLE room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)")
-                output.execSQL("INSERT INTO room_master_table VALUES(42,?)", arrayOf(schemas.getValue(2).getString("identityHash")))
+                output.execSQL("INSERT INTO room_master_table VALUES(42,?)", arrayOf(schemas.getValue(AppDatabase.VERSION).getString("identityHash")))
                 output.execSQL("CREATE TABLE backup_metadata (format TEXT NOT NULL, currency TEXT NOT NULL, createdAt INTEGER NOT NULL)")
                 output.execSQL("INSERT INTO backup_metadata VALUES(?,?,?)", arrayOf<Any>("ru.denpom.finance.app/1", currency, createdAt))
-                output.version = 2
+                output.version = AppDatabase.VERSION
                 output.setTransactionSuccessful()
             } finally { output.endTransaction() }
         }
     }
     data class Loaded(val data: DatabaseSnapshot, val currency: String?, val createdAt: Long?)
     fun read(file: File): Loaded = SQLiteDatabase.openDatabase(file.path, null, SQLiteDatabase.OPEN_READONLY).use { input ->
-        require(input.version in 1..2) { "Неподдерживаемая версия базы" }
+        require(input.version in 1..AppDatabase.VERSION) { "Неподдерживаемая версия базы" }
         input.rawQuery("PRAGMA integrity_check", null).use { require(it.moveToFirst() && it.getString(0) == "ok" && !it.moveToNext()) { "Копия повреждена или неполна" } }
         val identity = input.rawQuery("SELECT identity_hash FROM room_master_table WHERE id=42", null).use { require(it.moveToFirst()) { "Чужая база данных" }; it.getString(0) }
         require(identity == schemas.getValue(input.version).getString("identityHash")) { "Это не копия Денежного помощника" }
@@ -102,6 +102,8 @@ internal class BackupDatabase(private val context: Context, private val db: AppD
     }
     private fun validate(data: DatabaseSnapshot) {
         val enums = mapOf(
+            "payment_occurrences.status" to PaymentStatus.entries.map { it.name },
+            "operation_templates.type" to listOf("EXPENSE", "INCOME"),
             "accounts.type" to AccountType.entries.map { it.name }, "categories.kind" to CategoryKind.entries.map { it.name },
             "operations.type" to OperationType.entries.map { it.name }, "recurring.type" to listOf("EXPENSE", "INCOME"),
             "recurring.period" to RecurrencePeriod.entries.map { it.name }, "receipts.status" to ReceiptStatus.entries.map { it.name },
@@ -122,6 +124,7 @@ internal class BackupDatabase(private val context: Context, private val db: AppD
                         if (col.name == "id") require((value as Long) > 0)
                         if (col.name in setOf("timestamp", "nextDate", "createdAt", "startDate", "deadline", "dueDate", "warrantyUntil")) require((value as Long) in 0..253402214400000L) { "Некорректная дата" }
                         if (col.name == "amount" && t.name != "goal_entries") require((value as Long) >= 0 && value <= Long.MAX_VALUE / 1000) { "Некорректная сумма" }
+                        if (col.name in setOf("scheduledDay", "dueDay")) require((value as Long) in 0..2_932_896L) { "Некорректная дата платежа" }
                         if (col.name == "termMonths") require((value as Long) in 1..1200)
                         if (col.name == "ratePercent") require((value as Number).toDouble() in 0.0..100_000.0)
                     }
@@ -129,14 +132,30 @@ internal class BackupDatabase(private val context: Context, private val db: AppD
                 require(seen.add(row[t.columns.indexOfFirst { it.name == pk }])) { "Повторяющийся ключ ${t.name}" }
             }
         }
+        val paymentKeys = HashSet<Pair<Any?, Any?>>()
+        val linkedOperations = HashSet<Any>()
+        val paymentColumns = tables.first { it.name == "payment_occurrences" }.columns.map { it.name }
+        data.rows.getValue("payment_occurrences").forEach { row ->
+            require(paymentKeys.add(row[paymentColumns.indexOf("recurringId")] to row[paymentColumns.indexOf("scheduledDay")])) { "Повторяющийся платёж" }
+            val linked = row[paymentColumns.indexOf("operationId")]
+            val paid = row[paymentColumns.indexOf("status")] == PaymentStatus.PAID.name
+            require(paid == (linked != null) && (linked == null || linkedOperations.add(linked))) { "Некорректная связь с операцией платежа" }
+        }
         // Validate true foreign keys even if a foreign database disabled enforcement.
-        listOf(Triple("splits", "operationId", "operations"), Triple("receipt_items", "receiptId", "receipts"), Triple("goal_entries", "goalId", "goals"), Triple("debt_payments", "debtId", "debts")).forEach { (child, column, parent) ->
+        listOf(
+            Triple("splits", "operationId", "operations"), Triple("receipt_items", "receiptId", "receipts"),
+            Triple("goal_entries", "goalId", "goals"), Triple("debt_payments", "debtId", "debts"),
+            Triple("payment_occurrences", "recurringId", "recurring"), Triple("balance_checks", "accountId", "accounts"),
+            Triple("operation_templates", "accountId", "accounts"),
+        ).forEach { (child, column, parent) ->
             val childIndex = tables.first { it.name == child }.columns.indexOfFirst { it.name == column }
             val ids = data.rows.getValue(parent).map { it[0] }.toSet()
             require(data.rows.getValue(child).all { it[childIndex] in ids }) { "Нарушены связи $child" }
         }
     }
-    private val ordered get() = tables.sortedBy { if (it.name in setOf("splits", "receipt_items", "goal_entries", "debt_payments")) 1 else 0 }
+    private val ordered get() = tables.sortedBy {
+        if (it.name in setOf("splits", "receipt_items", "goal_entries", "debt_payments", "payment_occurrences", "balance_checks", "operation_templates")) 1 else 0
+    }
     private fun insert(data: DatabaseSnapshot, exec: (String, Array<Any?>) -> Unit) {
         ordered.forEach { t ->
             val sql = "INSERT INTO `${t.name}` (${columns(t)}) VALUES (${t.columns.joinToString(",") { "?" }})"

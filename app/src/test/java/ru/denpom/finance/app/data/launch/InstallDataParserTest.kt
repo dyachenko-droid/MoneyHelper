@@ -18,6 +18,16 @@ class InstallDataParserTest {
         }
     }
 
+    @Test fun capturesScalarFieldsWithoutConvertingNumericIdsToFloatingPoint() {
+        val data = parseInstallData("""{"af_status":"Non-organic","campaign_name":"RU_Video","adgroup_id":12345678901234567890,"adset":{"name":"ignored"},"ad_name":null}""")
+        assertEquals(InstallAttribution(InstallKind.PAID, "RU_Video", mapOf("adgroup_id" to "12345678901234567890")), data)
+    }
+
+    @Test fun noneIsOrganicWithOrWithoutAfStatus() {
+        assertEquals(InstallKind.ORGANIC, parseInstallData("""{"af_status":"Non-organic","campaign":"None"}""")?.kind)
+        assertEquals(InstallKind.ORGANIC, parseInstallData("""{"campaign_name":" none "}""")?.kind)
+    }
+
     @Test fun invalidCampaignTypeDoesNotDiscardValidStatus() {
         assertEquals(InstallAttribution(InstallKind.PAID),
             parseInstallData("""{"af_status":"Non-organic","campaign":{}}"""))

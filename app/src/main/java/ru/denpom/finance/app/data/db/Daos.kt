@@ -10,6 +10,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AccountDao {
+    @Query("SELECT * FROM accounts WHERE id = :id")
+    suspend fun get(id: Long): AccountEntity?
+
+    @Query("UPDATE accounts SET openingBalance = :openingBalance WHERE id = :id")
+    suspend fun updateOpeningBalance(id: Long, openingBalance: Long)
+
     @Query("SELECT * FROM accounts ORDER BY sort, id")
     fun observeAll(): Flow<List<AccountEntity>>
 
@@ -195,6 +201,9 @@ interface BudgetDao {
 
 @Dao
 interface RecurringDao {
+    @Query("SELECT * FROM recurring WHERE id = :id")
+    suspend fun get(id: Long): RecurringEntity?
+
     @Query("SELECT * FROM recurring ORDER BY nextDate")
     fun observeAll(): Flow<List<RecurringEntity>>
 
@@ -228,6 +237,15 @@ interface GoalDao {
 
 @Dao
 interface DebtDao {
+    @Query("SELECT * FROM debts WHERE id = :id")
+    suspend fun get(id: Long): DebtEntity?
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM debt_payments WHERE debtId = :id")
+    suspend fun paid(id: Long): Long
+
+    @Query("UPDATE debts SET dueDate = :date WHERE id = :id")
+    suspend fun reschedule(id: Long, date: Long)
+
     @Query("SELECT * FROM debts ORDER BY createdAt DESC")
     fun observeDebts(): Flow<List<DebtEntity>>
 

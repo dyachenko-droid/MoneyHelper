@@ -93,6 +93,7 @@ fun AddOperationSheet(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
+    val templates by viewModel.templates.collectAsStateWithLifecycle()
     val actions = LocalAppActions.current
     val haptics = LocalHapticFeedback.current
     val sheet = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -200,6 +201,20 @@ fun AddOperationSheet(
             }
 
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (state.editId == null && templates.isNotEmpty()) {
+                    var showTemplates by remember { mutableStateOf(false) }
+                    Box {
+                        FilterChip("Шаблоны") { showTemplates = true }
+                        DropdownMenu(showTemplates, { showTemplates = false }) {
+                            templates.forEach { template ->
+                                DropdownMenuItem({ Text(template.name) }, {
+                                    viewModel.applyTemplate(template)
+                                    showTemplates = false
+                                })
+                            }
+                        }
+                    }
+                }
                 if (state.type != OperationType.TRANSFER) {
                     var menu by remember { mutableStateOf(false) }
                     Box {

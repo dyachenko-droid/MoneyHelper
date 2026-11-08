@@ -16,6 +16,8 @@ import ru.denpom.finance.app.domain.model.Category
 import ru.denpom.finance.app.domain.model.CategoryKind
 import ru.denpom.finance.app.domain.model.Operation
 import ru.denpom.finance.app.domain.model.OperationType
+import ru.denpom.finance.app.domain.model.OperationTemplate
+import ru.denpom.finance.app.data.repository.OperationTemplateRepository
 import ru.denpom.finance.app.domain.model.Period
 import ru.denpom.finance.app.domain.repository.AccountRepository
 import ru.denpom.finance.app.domain.repository.CategoryRepository
@@ -55,6 +57,7 @@ class AddOperationViewModel @Inject constructor(
     private val operations: OperationRepository,
     private val saveOperation: SaveOperationUseCase,
     private val categorize: CategorizeItemsUseCase,
+    templateRepository: OperationTemplateRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddState())
@@ -64,6 +67,20 @@ class AddOperationViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val categories: StateFlow<List<Category>> = categoriesRepo.observeCategories()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    val templates = templateRepository.templates.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun applyTemplate(template: OperationTemplate) {
+        val account = accounts.value.firstOrNull { it.id == template.accountId } ?: return
+        _state.update { state ->
+            if (state.editId != null) state
+            else state.copy(
+                type = template.type, accountId = account.id, title = template.name,
+                categoryId = template.categoryId?.takeIf { id -> categories.value.any { it.id == id } },
+                repeat = false,
+            )
+        }
+    }
 
     fun start(request: AddRequest) {
         viewModelScope.launch {
@@ -89,18 +106,22 @@ class AddOperationViewModel @Inject constructor(
                 return@launch
             }
             val ts = request.timestamp?.let { Instant.ofEpochMilli(it).atZone(Period.zone) }
-            val kind = if (request.type == OperationType.INCOME) CategoryKind.INCOME else CategoryKind.EXPENSE
+            val template = request.template
+            val type = template?.type ?: request.type
+            val kind = if (type == OperationType.INCOME) CategoryKind.INCOME else CategoryKind.EXPENSE
             val guessed = if (request.title.isNotBlank()) categorize.categoryForTitle(request.title) else null
             _state.value = AddState(
-                type = request.type,
+                type = type,
                 amount = if (request.amount > 0) amountInput(request.amount) else "",
-                categoryId = guessed ?: cats.firstOrNull { it.kind == kind }?.id,
-                accountId = accs.firstOrNull()?.id,
+                categoryId = if (template == null) guessed ?: cats.firstOrNull { it.kind == kind }?.id
+                    else template.categoryId?.takeIf { id -> cats.any { it.id == id && it.kind == kind } },
+                accountId = if (template == null) accs.firstOrNull()?.id
+                    else accs.firstOrNull { it.id == template.accountId }?.id,
                 toAccountId = accs.getOrNull(1)?.id,
                 date = ts?.toLocalDate() ?: LocalDate.now(),
                 time = ts?.toLocalTime() ?: LocalTime.now(),
                 note = request.note,
-                title = request.title,
+                title = template?.name ?: request.title,
             )
         }
     }

@@ -14,6 +14,7 @@ interface LaunchPreferences {
 interface AttributionRepository {
     val updates: StateFlow<InstallAttribution?>
     val appsFlyerId: String
+    suspend fun deviceAdvertisingId(): String?
     suspend fun refresh(): InstallAttribution?
 }
 

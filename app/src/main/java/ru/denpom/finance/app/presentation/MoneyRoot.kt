@@ -62,6 +62,10 @@ import ru.denpom.finance.app.presentation.home.HomeScreen
 import ru.denpom.finance.app.presentation.more.BackupScreen
 import ru.denpom.finance.app.presentation.more.MoreScreen
 import ru.denpom.finance.app.presentation.navigation.Routes
+import ru.denpom.finance.app.presentation.planning.BalanceCheckScreen
+import ru.denpom.finance.app.presentation.planning.MonthlyReportScreen
+import ru.denpom.finance.app.presentation.planning.OperationTemplatesScreen
+import ru.denpom.finance.app.presentation.planning.PaymentCalendarScreen
 import ru.denpom.finance.app.presentation.onboarding.OnboardingScreen
 import ru.denpom.finance.app.presentation.operations.OperationsScreen
 import ru.denpom.finance.app.presentation.receipt.ReceiptScreen
@@ -177,7 +181,7 @@ private fun AppNavHost(nav: NavHostController, start: String, actions: AppAction
                 onAllOperations = { nav.navigate(Routes.OPS) { popUpTo(Routes.HOME) { saveState = true }; launchSingleTop = true; restoreState = true } },
                 onBudgets = { nav.navigate(Routes.BUDGETS) { popUpTo(Routes.HOME) { saveState = true }; launchSingleTop = true; restoreState = true } },
                 onAccounts = { nav.navigate(Routes.ACCOUNTS) },
-                onSubscriptions = { nav.navigate(Routes.SUBSCRIPTIONS) },
+                onSubscriptions = { nav.navigate(Routes.PAYMENTS) },
                 onMore = { nav.navigate(Routes.MORE) { popUpTo(Routes.HOME) { saveState = true }; launchSingleTop = true; restoreState = true } },
                 onOperation = { op -> openOperation(nav, actions, op) },
             )
@@ -200,16 +204,30 @@ private fun AppNavHost(nav: NavHostController, start: String, actions: AppAction
         composable(Routes.RECEIPT) {
             ReceiptScreen(onBack = { nav.popBackStack() }, onSaved = { nav.popBackStack() })
         }
-        composable(Routes.ACCOUNTS) { AccountsScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.ACCOUNTS) { AccountsScreen(onBack = { nav.popBackStack() }, onReconcile = { nav.navigate(Routes.RECONCILE) }) }
         composable(Routes.SUBSCRIPTIONS) { SubscriptionsScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.CATEGORIES) { CategoriesScreen(onBack = { nav.popBackStack() }) }
-        composable(Routes.ANALYTICS) { AnalyticsScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.ANALYTICS) { AnalyticsScreen(onBack = { nav.popBackStack() }, onMonthlyReport = { nav.navigate(Routes.MONTHLY_REPORT) }) }
         composable(Routes.BACKUP) { BackupScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.GOALS) { GoalsScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.DEBTS) { DebtsScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.SECURITY) { SecurityScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.REMINDERS) { RemindersScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.IMPORT) { ImportScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.PAYMENTS) {
+            PaymentCalendarScreen(
+                onBack = { nav.popBackStack() },
+                onSchedules = { nav.navigate(Routes.SUBSCRIPTIONS) },
+                onOperation = { openOperation(nav, actions, it) },
+            )
+        }
+        composable(Routes.RECONCILE) {
+            BalanceCheckScreen(onBack = { nav.popBackStack() }, onOperation = { openOperation(nav, actions, it) })
+        }
+        composable(Routes.TEMPLATES) { OperationTemplatesScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.MONTHLY_REPORT) {
+            MonthlyReportScreen(onBack = { nav.popBackStack() }, onOperation = { openOperation(nav, actions, it) })
+        }
     }
 }
 

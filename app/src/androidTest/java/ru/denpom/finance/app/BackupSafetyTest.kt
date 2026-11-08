@@ -19,6 +19,8 @@ import ru.denpom.finance.app.data.repository.*
 import ru.denpom.finance.app.domain.model.*
 import ru.denpom.finance.app.domain.repository.*
 import java.io.File
+import java.time.LocalDate
+import kotlinx.coroutines.flow.first
 import java.util.UUID
 import java.util.zip.ZipFile
 
@@ -64,6 +66,13 @@ class BackupSafetyTest {
         db.debtDao().upsert(DebtEntity(1, "Друг", "TO_ME", 100000, "", 1_794_000_000_000, null))
         db.debtDao().insertPayment(DebtPaymentEntity(debtId = 1, amount = 50, timestamp = 1_794_000_000_000))
         db.debtDao().upsertLoan(LoanEntity(1, "Кредит", 100000, 12.5, 12, 1_794_000_000_000, 1))
+        db.paymentOccurrenceDao().save(PaymentOccurrenceEntity(
+            recurringId = 1, scheduledDay = 20_000, dueDay = 20_001, status = PaymentStatus.PAID.name, operationId = 3,
+        ))
+        db.operationTemplateDao().save(OperationTemplateEntity(name = "Покупка", type = "EXPENSE", accountId = 1, categoryId = 1))
+        db.balanceCheckDao().insert(BalanceCheckEntity(
+            accountId = 1, timestamp = 1_794_000_000_000, recordedBalance = 50000, actualBalance = 49900,
+        ))
         val original = engine.snapshot()
         val out = file("data.db")
         engine.write(out, original, "RUB", 123)
@@ -151,6 +160,91 @@ class BackupSafetyTest {
         assertEquals(0, engine.snapshot().count("goals"))
         repo.rollback(); assertEquals("Карта", engine.snapshot().rows.getValue("accounts").single()[1])
     }
+    @Test fun migrationFromTwoPreservesExistingAccountAndAddsPlanningTables() = runBlocking {
+        val name = file("migration.db").absolutePath
+        val schema = JSONObject(context.assets.open("backup_schema/2.json").bufferedReader().use { it.readText() }).getJSONObject("database")
+        SQLiteDatabase.openOrCreateDatabase(name, null).use { legacy ->
+            val entities = schema.getJSONArray("entities")
+            for (i in 0 until entities.length()) {
+                val entity = entities.getJSONObject(i)
+                val table = entity.getString("tableName")
+                legacy.execSQL(entity.getString("createSql").replace("\${TABLE_NAME}", table))
+                val indices = entity.optJSONArray("indices") ?: continue
+                for (j in 0 until indices.length()) {
+                    legacy.execSQL(indices.getJSONObject(j).getString("createSql").replace("\${TABLE_NAME}", table))
+                }
+            }
+            legacy.execSQL("CREATE TABLE room_master_table(id INTEGER PRIMARY KEY,identity_hash TEXT)")
+            legacy.execSQL("INSERT INTO room_master_table VALUES(42,?)", arrayOf(schema.getString("identityHash")))
+            legacy.execSQL("INSERT INTO accounts VALUES(1,'Карта','CARD','',12345,NULL,0)")
+            legacy.version = 2
+        }
+        val migrated = Room.databaseBuilder(context, AppDatabase::class.java, name).build()
+        try {
+            assertEquals(12345L, migrated.accountDao().get(1)?.openingBalance)
+            assertTrue(migrated.paymentOccurrenceDao().observeAll().first().isEmpty())
+            assertTrue(migrated.operationTemplateDao().observeAll().first().isEmpty())
+            assertTrue(migrated.balanceCheckDao().observeAll().first().isEmpty())
+        } finally {
+            migrated.close()
+        }
+    }
+
+    @Test fun automaticPaymentDoesNotDuplicateLinkedExpenseOrRescheduledOccurrence() = runBlocking {
+        val today = LocalDate.now()
+        val operations = OperationRepositoryImpl(db.operationDao())
+        val calendar = PaymentCalendarRepository(db, operations)
+        val id = db.recurringDao().upsert(RecurringEntity(
+            title = "Подписка", amount = 19900, type = "EXPENSE", accountId = 1, categoryId = null,
+            period = "MONTHLY", nextDate = Period.startOfDay(today), isSubscription = true, autoCreate = true,
+        ))
+        val rule = db.recurringDao().get(id)!!.toDomain()
+        val item = ScheduledPayment(rule, PaymentOccurrence(id, today))
+        calendar.resolve(item, PaymentStatus.PENDING, today.plusDays(1))
+        calendar.materializeAutomatic(today)
+        assertEquals(1, operations.all().size)
+        val moved = item.copy(occurrence = item.occurrence.copy(due = today.plusDays(1)))
+        val existingId = operations.save(Operation(
+            0, OperationType.EXPENSE, 19900, 1, null, null, "Из выписки", "",
+            Period.startOfDay(today.plusDays(1)), null,
+        ))
+        calendar.resolve(moved, PaymentStatus.PAID, linkId = existingId)
+        calendar.materializeAutomatic(today.plusDays(1))
+        assertEquals(2, operations.all().size)
+        assertEquals(existingId, db.paymentOccurrenceDao().find(id, today.toEpochDay())?.operationId)
+        fails { calendar.resolve(moved, PaymentStatus.PAID, linkId = existingId) }
+    }
+
+    @Test fun automaticPaymentMovedEarlierUsesTheNewDateOnce() = runBlocking {
+        val today = LocalDate.now()
+        val scheduled = today.plusDays(3)
+        val operations = OperationRepositoryImpl(db.operationDao())
+        val calendar = PaymentCalendarRepository(db, operations)
+        val id = db.recurringDao().upsert(RecurringEntity(
+            title = "Интернет", amount = 50000, type = "EXPENSE", accountId = 1, categoryId = null,
+            period = "MONTHLY", nextDate = Period.startOfDay(scheduled), isSubscription = true, autoCreate = true,
+        ))
+        val rule = db.recurringDao().get(id)!!.toDomain()
+        calendar.resolve(ScheduledPayment(rule, PaymentOccurrence(id, scheduled)), PaymentStatus.PENDING, today)
+        calendar.materializeAutomatic(today)
+        val expense = operations.all().single { it.title == "Интернет" }
+        assertEquals(today, Period.dateOf(expense.timestamp))
+        calendar.materializeAutomatic(scheduled)
+        assertEquals(1, operations.all().count { it.title == "Интернет" })
+    }
+
+    @Test fun staleBalanceCannotBeAdjustedAndCorrectionDoesNotCreateAnExpense() = runBlocking {
+        val operations = OperationRepositoryImpl(db.operationDao())
+        val account = AccountRepositoryImpl(db.accountDao(), db.operationDao())
+        val checks = BalanceCheckRepository(db, operations)
+        val old = account.observeAccounts().first().single().balance
+        checks.save(1, old, old - 500, adjust = true)
+        fails { checks.save(1, old, old - 500, adjust = true) }
+        assertEquals(old - 500, account.observeAccounts().first().single().balance)
+        assertEquals(-500L, checks.checks.first().single().adjustment)
+        assertEquals(1, operations.all().size)
+    }
+
     @Test fun csvBatchFailureCannotLeavePartialImport() = runBlocking {
         val before = engine.snapshot()
         db.openHelper.writableDatabase.execSQL("CREATE TRIGGER reject_second BEFORE INSERT ON operations WHEN NEW.title='fail' BEGIN SELECT RAISE(ABORT,'failure'); END")

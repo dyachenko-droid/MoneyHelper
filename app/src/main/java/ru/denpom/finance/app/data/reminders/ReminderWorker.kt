@@ -19,9 +19,10 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
 import ru.denpom.finance.app.MainActivity
+import ru.denpom.finance.app.data.repository.PaymentCalendarRepository
+import ru.denpom.finance.app.domain.usecase.PaymentSchedule
 import ru.denpom.finance.app.R
 import ru.denpom.finance.app.domain.model.DebtDirection
-import ru.denpom.finance.app.domain.model.OperationType
 import ru.denpom.finance.app.domain.model.Period
 import ru.denpom.finance.app.domain.repository.DebtRepository
 import ru.denpom.finance.app.domain.repository.OperationRepository
@@ -38,6 +39,7 @@ interface ReminderEntryPoint {
     fun recurring(): RecurringRepository
     fun debts(): DebtRepository
     fun scheduler(): ReminderScheduler
+    fun calendar(): PaymentCalendarRepository
 }
 
 class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
@@ -57,7 +59,10 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
         if (settings.paymentReminders) {
             val tomorrow = Period.startOfDay(today.plusDays(1))
             val after = Period.startOfDay(today.plusDays(2))
-            val payments = deps.recurring().all().filter { it.type == OperationType.EXPENSE && it.nextDate in tomorrow until after }
+            val date = today.plusDays(1)
+            val payments = PaymentSchedule.pendingExpenses(
+                deps.recurring().all(), deps.calendar().occurrences.first(), deps.operations().all(), date, date,
+            ).map { it.rule }
             val debts = deps.debts().observeDebts().first().filter { it.direction == DebtDirection.FROM_ME && !it.closed && it.dueDate in tomorrow until after }
             val lines = payments.map { "${it.title} — ${fmt.format(it.amount, it.amount % 100 != 0L)}" } +
                 debts.map { "Вернуть ${it.person} — ${fmt.format(it.left, false)}" }

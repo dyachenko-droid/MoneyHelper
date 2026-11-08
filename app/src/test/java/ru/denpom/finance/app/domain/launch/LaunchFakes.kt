@@ -18,6 +18,12 @@ class FakeLaunchPreferences(
 class FakeAttributionRepository(initial: InstallAttribution? = null) : AttributionRepository {
     override val updates = MutableStateFlow(initial)
     override var appsFlyerId = "af-123"
+    var advertisingIdReads = 0
+    var readAdvertisingId: suspend () -> String? = { null }
+    override suspend fun deviceAdvertisingId(): String? {
+        advertisingIdReads++
+        return readAdvertisingId()
+    }
     var refreshes = 0
     var refresh: suspend () -> InstallAttribution? = { null }
     override suspend fun refresh(): InstallAttribution? { refreshes++; return refresh.invoke() }

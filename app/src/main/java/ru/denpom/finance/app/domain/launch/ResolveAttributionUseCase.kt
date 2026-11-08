@@ -17,10 +17,11 @@ class ResolveAttributionUseCase(private val repository: AttributionRepository) {
     suspend operator fun invoke(): InstallAttribution = coroutineScope {
         val decision = CompletableDeferred<InstallAttribution>()
         var refresh: Deferred<InstallAttribution?>? = null
+        var gcd: InstallAttribution? = null
 
         suspend fun refreshOnce(): InstallAttribution? {
             val request = refresh?.takeIf { it.isActive } ?: async {
-                try { repository.refresh() }
+                try { repository.refresh()?.classified().also { gcd = it } }
                 catch (cancelled: CancellationException) { throw cancelled }
                 catch (_: Exception) { null }
             }.also { refresh = it }
@@ -28,21 +29,28 @@ class ResolveAttributionUseCase(private val repository: AttributionRepository) {
         }
 
         fun publish(server: InstallAttribution?, fallback: InstallAttribution? = null) {
-            val sdk = repository.updates.value
-            val selected = if (sdk?.kind == InstallKind.PAID) {
-                sdk.copy(campaign = sdk.campaign ?: server?.takeIf { it.kind == InstallKind.PAID }?.campaign)
-            } else server ?: fallback
+            val sdk = repository.updates.value?.classified()
+            val selected = when {
+                sdk?.explicitlyOrganic == true -> sdk
+                sdk?.kind == InstallKind.PAID -> {
+                    if (sdk.campaign == null && server?.explicitlyOrganic == true) server
+                    else sdk.supplement(server)
+                }
+                else -> server ?: fallback?.classified()
+            }
             if (selected != null) decision.complete(selected)
         }
 
         val sdkObserver = launch {
-            repository.updates.map { it?.kind }.filterNotNull().distinctUntilChanged().collectLatest { kind ->
-                if (kind == InstallKind.PAID) publish(repository.updates.value)
-                else {
-                    delay(5_000)
-                    publish(refreshOnce(), repository.updates.value)
+            repository.updates.filterNotNull()
+                .map { it.classified().let { data -> data.kind to data.explicitlyOrganic } }
+                .distinctUntilChanged().collectLatest { (kind, explicitlyOrganic) ->
+                    if (kind == InstallKind.PAID || explicitlyOrganic) publish(gcd, repository.updates.value)
+                    else {
+                        delay(5_000)
+                        publish(refreshOnce(), repository.updates.value)
+                    }
                 }
-            }
         }
         val recovery = launch {
             delay(10_000)

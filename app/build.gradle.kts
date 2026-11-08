@@ -82,6 +82,7 @@ ksp {
 dependencies {
     implementation(libs.appsflyer)
     implementation(libs.installreferrer)
+    implementation(libs.play.services.ads.identifier)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.database)
     implementation(libs.onesignal.notifications)
